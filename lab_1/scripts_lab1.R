@@ -26,7 +26,7 @@ sapply(data, typeof)
 sapply(data, class)
 
 # Histogram of "e: edible" & "p: poisonous"
-barplot(table(data["V1"]))
+barplot(width=c(5, 10), space=0, names.arg=c("Comestible", "Venenoso"), table(data["V1"]), legend="Histograma de Hongos 'Comestibles' v/s 'Venenosos'", col = "BLUE")
 
 # Calculate Var
 #numeric_v1 <- as.numeric(as.character(data["V1"])) 
@@ -35,8 +35,12 @@ s <- as.numeric(unlist(data["V1"]))
 var(s)
 sd(s)
 
+hist(s, freq=TRUE, col="RED")
+
 # Shows variable info of column "V1"
 round(addmargins(a))
 
 # Shows % of "edible" & "poisonous"
-prop.table(table(data["V1"]))
+# Multiply by 100 to adjust
+v1_percentage <- 100*prop.table(table(data["V1"]))
+cat(v1_percentage)
