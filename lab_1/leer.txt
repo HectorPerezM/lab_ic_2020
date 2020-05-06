@@ -1,0 +1,18 @@
+Pasos:
+	1. Resumir papers que se vinculan con el dataset para incorporalos al informe como un pequeño estado del arte
+	2. detallar el dataset
+		2.0 buscar tecnicas de estadistica descriptiva e inferencial :D
+		2.1 Tabla con nombre y significado de cada variable
+		2.2 medidas de cada variable (varianza, desv. estandar, gráficos relacionados)
+	3. info de un experto en el area.
+		El nico (un amigo) tiene un conocido que estudio bioingenieria y trabaja con hongos, podriamos preguntarle a el
+
+
+	Estructura informe:
+		1. Introduccion
+		2. Describir problema:
+			2.1 Descripcion base de datos
+			2.2 Descricipn clases y variables
+		3. Analissi estadistico e inferencial
+		4. conclusiones respecto al problema y respecto al analisis del conjunto de datos
+		5. Ref APA

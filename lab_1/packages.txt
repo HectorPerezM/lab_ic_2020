@@ -1,0 +1,16 @@
+--- Instalacion ---
+
+En RStudio te vas a Tools -> Install Packages -> En la barra escribes el paquete que quieres instalar (clickeas install dependencies) -> Install
+
+Instalar los siguientes paquetes:
+
+	ggpubr
+
+
+--- ERRORES ---
+
+En caso de que no te deje instarlo o te arroje error de "curl" ver:
+	
+	https://stackoverflow.com/questions/52082543/curl-package-not-available-for-several-r-packages
+
+
