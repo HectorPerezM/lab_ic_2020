@@ -42,14 +42,14 @@ ncol(data)
 # N° rows dataset
 nrow(data)
 
-# ---------- Analysis V1 -> type -------------------------
+# ---------- Analysis type -------------------------
 # type:
 #   e -> edible
 #   p -> poisonous
 
 # Count observations for each class
 type_table <- table(data$type)
-print(type_table[1])
+print(type_table)
 
 # Get percentage of each class: "e" & "p"
 type_percentage <- 100*prop.table(table(data$type))
@@ -64,3 +64,27 @@ type_df <- data.frame(type=c("edible", "poisonous"), n_mushrooms=c(type_table[1]
 ggbarplot(type_df, x = "type", y = "n_mushrooms", xlab=c("Type"), ylab="# of Mushrooms", 
           fill="type", color="type", palette = c("#f6f578", "#06623b"), width = c(0.4, 0.4), 
           title = "Consumable Mushrooms", label = TRUE, label.pos = "out")
+
+# ---------- Analysis cap_shape -------------------------
+# cap_shape:
+#   b -> bell     x -> convex k -> knobbed  
+#   c -> conical  f -> flat   s -> sunken
+
+#Count observation per class
+cap_shape_table <- table(data$cap_shape)
+print(cap_shape_table)
+
+# Get percentage of each class: "e" & "p"
+cap_shape_percentage <- 100*prop.table(table(data$cap_shape))
+print(cap_shape_percentage)
+
+# Dataframe formatted to create barplot of cap_shape
+cap_shape_df <- data.frame(cap_shape=c("bell", "conical", "flat", "knobbed", "sunken", "convex"), 
+                                       n_mushrooms=c(cap_shape_table[1], cap_shape_table[2], cap_shape_table[3], 
+                                                     cap_shape_table[4], cap_shape_table[5], cap_shape_table[6]))
+# Barplot of cap_shape
+ggbarplot(cap_shape_df, x = "cap_shape", y = "n_mushrooms", xlab=c("Cap Shapes"), ylab="# of Mushrooms", 
+          fill="cap_shape", color="cap_shape", palette = c("#ffd31d", "#06623b", "#ffb385", "#ff7272", "#00a1ab", "#00263b"), 
+          title = "Mushroom's Cap Shapes", label = TRUE, label.pos = "out")
+
+# TODO -> que hacer con el grafico anterior?, ya que hay valores muy pequeños
