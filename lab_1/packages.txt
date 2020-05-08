@@ -5,6 +5,7 @@ En RStudio te vas a Tools -> Install Packages -> En la barra escribes el paquete
 Instalar los siguientes paquetes:
 
 	ggpubr
+	dplyr
 
 
 --- ERRORES ---
