@@ -1,0 +1,15 @@
+De los dos papers, 
+
+-Extraction of logical rules from training data using backpropagation networks: 
+Este artículo se busca encontrar reglas obtenidas de los datos de entrenamiento de bases de datos utilizando algoritmos de retropropagación.
+Muestra como el algoritmo utilizado funciona con la base de datos Mushrooms y como se calibró el modelo.
+
+
+-Data Mining on a Mushroom Database
+Este paper utiliza distintas técnicas de clasificación para el problema de hongos, y las compara en la Base de datos de Schlimmer y también
+con otra que fue provista por un cliente. Los mejores resultados para entrenamiento y clasificación fueron para The unpruned decision tree (J48),
+y en segundo lugar para k-nearest-neighbor (IBk).
+
+El Resumen de los papers está en el siguiente enlace a google docs.
+
+https://docs.google.com/document/d/16bCWkEwpTKvWPb9AhPYxrSJroFxfC1gX7mSoicqBw_8/edit?usp=sharing
