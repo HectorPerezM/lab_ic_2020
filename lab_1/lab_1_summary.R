@@ -626,3 +626,103 @@ ggbarplot(ring_type_df, x = "ring_type", y = "n_mushrooms", xlab=c("Ring Type"),
           palette = c("#D980FA", "#9980FA"), 
           title = "Mushroom's Ring Type", label = TRUE, label.pos = "out")
 
+
+
+# ---------- Analysis spore_print_color  -------------------------
+# spore_print_color
+#   b ->  black     n -> brown    b -> buff      h -> chocolate   y ->yellow
+#   r -> green      o -> orange   u -> purple    w -> white
+
+#Count observation per class & type
+spore_print_color_table <- table(data$type, data$spore_print_color)
+print(spore_print_color_table)
+
+#TODO Considerar hacer un gráfico de torta para los % 
+#SACAR % DE LOS COMESTIBLES QUE TIENEN ODOR X ETC... 
+# Get percentage of each class: "b", "n", "b", "h", "r", "o", "u", "w", "y"
+spore_print_color_percent <- 100*prop.table(table(data$spore_print_color))
+print(spore_print_color_percent)
+
+# Dataframe formatted to create barplot of spore_print_color
+spore_print_color_df <- data.frame(spore_print_color=rep(c("black", "brown", "buff", "chocolate", "green","orange", "purple","white","yellow"), each = 2), 
+                                   n_mushrooms=c(spore_print_color_table[,1], spore_print_color_table[,2],
+                                                 spore_print_color_table[,3], spore_print_color_table[,4],
+                                                 spore_print_color_table[,5], spore_print_color_table[,6],
+                                                 spore_print_color_table[,7], spore_print_color_table[,8],
+                                                 spore_print_color_table[,9]),
+                                   type=rep(c("edible", "poisonous"), each = 1))
+
+
+# Barplot of spore_print_color
+# Separated plot by "edible" & "poisonous"
+ggbarplot(spore_print_color_df, x = "spore_print_color", y = "n_mushrooms", xlab=c("Spore Print Color"), ylab="# of Mushrooms", 
+          fill="type", color="type", position = position_dodge(0.8), lab.col = "type",
+          palette = c("#D980FA", "#9980FA"), 
+          title = "Mushroom's Spore Print Color", label = TRUE, label.pos = "out")
+
+
+
+# ---------- Analysis population  -------------------------
+# population:
+#   a ->  abundant    c -> clustered    n -> numerous
+#   s -> scattered    v -> several      y -> solitary
+
+
+#Count observation per class & type
+population_table <- table(data$type, data$population)
+print(population_table)
+
+#TODO Considerar hacer un gráfico de torta para los % 
+#SACAR % DE LOS COMESTIBLES QUE TIENEN ODOR X ETC... 
+# Get percentage of each class: "a", "c", "n", "s", "v", "y"
+population_percent <- 100*prop.table(table(data$population))
+print(population_percent)
+
+# Dataframe formatted to create barplot of population
+population_df <- data.frame(population=rep(c("abundant", "clustered", "numerous", "scattered", "several","solitary"), each = 2), 
+                            n_mushrooms=c(population_table[,1], population_table[,2],
+                                          population_table[,3], population_table[,4],
+                                          population_table[,5], population_table[,6]),
+                            type=rep(c("edible", "poisonous"), each = 1))
+
+
+# Barplot of population
+# Separated plot by "edible" & "poisonous"
+ggbarplot(population_df, x = "population", y = "n_mushrooms", xlab=c("Population"), ylab="# of Mushrooms", 
+          fill="type", color="type", position = position_dodge(0.8), lab.col = "type",
+          palette = c("#D980FA", "#9980FA"), 
+          title = "Mushroom's Population", label = TRUE, label.pos = "out")
+
+
+# ---------- Analysis habitat  -------------------------
+# habitat:
+#   g ->  grasses   l -> leaves    m -> meadow   p -> paths
+#   u -> urban      w -> waste     d -> woods
+
+
+
+#Count observation per class & type
+habitat_table <- table(data$type, data$habitat)
+print(habitat_table)
+
+#TODO Considerar hacer un gráfico de torta para los % 
+#SACAR % DE LOS COMESTIBLES QUE TIENEN ODOR X ETC... 
+# Get percentage of each class: "g", "l", "m", "p", "u", "w", "d"
+habitat_percent <- 100*prop.table(table(data$habitat))
+print(habitat_percent)
+
+# Dataframe formatted to create barplot of habitat
+habitat_df <- data.frame(habitat=rep(c("grasses", "leaves", "meadow", "paths", "urban","waste","woods"), each = 2), 
+                         n_mushrooms=c(habitat_table[,1], habitat_table[,2],
+                                       habitat_table[,3], habitat_table[,4],
+                                       habitat_table[,5], habitat_table[,6],
+                                       habitat_table[,7]),
+                         type=rep(c("edible", "poisonous"), each = 1))
+
+
+# Barplot of habitat
+# Separated plot by "edible" & "poisonous"
+ggbarplot(habitat_df, x = "habitat", y = "n_mushrooms", xlab=c("Habitat"), ylab="# of Mushrooms", 
+          fill="type", color="type", position = position_dodge(0.8), lab.col = "type",
+          palette = c("#D980FA", "#9980FA"), 
+          title = "Mushroom's Habitat", label = TRUE, label.pos = "out")
