@@ -485,7 +485,7 @@ stalk_color_above_ring_df <- data.frame(stalk_color_above_ring=rep(c("buff", "ci
 # Separated plot by "edible" & "poisonous"
 ggbarplot(stalk_color_above_ring_df, x = "stalk_color_above_ring", y = "n_mushrooms", xlab=c("Stalk Color Above Ring"), ylab="# of Mushrooms", 
           fill="type", color="type", position = position_dodge(0.8), lab.col = "type",
-          palette = c("#D980FA", "#9980FA"), 
+          palette = c("#47A414", "#A45414"), 
           title = "Mushroom's Stalk Color Above Ring", label = TRUE, label.pos = "out")
 
 
@@ -517,7 +517,7 @@ stalk_color_below_ring_df <- data.frame(stalk_color_below_ring=rep(c("buff", "ci
 # Separated plot by "edible" & "poisonous"
 ggbarplot(stalk_color_below_ring_df, x = "stalk_color_below_ring", y = "n_mushrooms", xlab=c("Stalk Color Below Ring"), ylab="# of Mushrooms", 
           fill="type", color="type", position = position_dodge(0.8), lab.col = "type",
-          palette = c("#D980FA", "#9980FA"), 
+          palette = c("#19D0BC", "#442783"), 
           title = "Mushroom's Stalk Color Below Ring", label = TRUE, label.pos = "out")
 
 
@@ -558,7 +558,7 @@ veil_color_df <- data.frame(veil_color=rep(c("brown", "orange", "white", "yellow
 # Separated plot by "edible" & "poisonous"
 ggbarplot(veil_color_df, x = "veil_color", y = "n_mushrooms", xlab=c("Veil Color"), ylab="# of Mushrooms", 
           fill="type", color="type", position = position_dodge(0.8), lab.col = "type",
-          palette = c("#D980FA", "#9980FA"), 
+          palette = c("#AAF338", "#CB25B6"), 
           title = "Mushroom's Veil Color", label = TRUE, label.pos = "out")
 
 
@@ -590,7 +590,7 @@ ring_number_df <- data.frame(ring_number=rep(c("none", "one", "two"), each = 2),
 # Separated plot by "edible" & "poisonous"
 ggbarplot(ring_number_df, x = "ring_number", y = "n_mushrooms", xlab=c("Ring Number"), ylab="# of Mushrooms", 
           fill="type", color="type", position = position_dodge(0.8), lab.col = "type",
-          palette = c("#D980FA", "#9980FA"), 
+          palette = c("#344DDD", "#0F8343"), 
           title = "Mushroom's Ring Number", label = TRUE, label.pos = "out")
 
 
@@ -623,7 +623,7 @@ ring_type_df <- data.frame(ring_type=rep(c("evanescent", "flaring", "large", "no
 # Separated plot by "edible" & "poisonous"
 ggbarplot(ring_type_df, x = "ring_type", y = "n_mushrooms", xlab=c("Ring Type"), ylab="# of Mushrooms", 
           fill="type", color="type", position = position_dodge(0.8), lab.col = "type",
-          palette = c("#D980FA", "#9980FA"), 
+          palette = c("#10A78B", "#DDC60A"), 
           title = "Mushroom's Ring Type", label = TRUE, label.pos = "out")
 
 
@@ -657,7 +657,7 @@ spore_print_color_df <- data.frame(spore_print_color=rep(c("black", "brown", "bu
 # Separated plot by "edible" & "poisonous"
 ggbarplot(spore_print_color_df, x = "spore_print_color", y = "n_mushrooms", xlab=c("Spore Print Color"), ylab="# of Mushrooms", 
           fill="type", color="type", position = position_dodge(0.8), lab.col = "type",
-          palette = c("#D980FA", "#9980FA"), 
+          palette = c("#17B72B", "#F39516"), 
           title = "Mushroom's Spore Print Color", label = TRUE, label.pos = "out")
 
 
@@ -690,7 +690,7 @@ population_df <- data.frame(population=rep(c("abundant", "clustered", "numerous"
 # Separated plot by "edible" & "poisonous"
 ggbarplot(population_df, x = "population", y = "n_mushrooms", xlab=c("Population"), ylab="# of Mushrooms", 
           fill="type", color="type", position = position_dodge(0.8), lab.col = "type",
-          palette = c("#D980FA", "#9980FA"), 
+          palette = c("#1F83AD", "#AD1F83"), 
           title = "Mushroom's Population", label = TRUE, label.pos = "out")
 
 
@@ -724,5 +724,5 @@ habitat_df <- data.frame(habitat=rep(c("grasses", "leaves", "meadow", "paths", "
 # Separated plot by "edible" & "poisonous"
 ggbarplot(habitat_df, x = "habitat", y = "n_mushrooms", xlab=c("Habitat"), ylab="# of Mushrooms", 
           fill="type", color="type", position = position_dodge(0.8), lab.col = "type",
-          palette = c("#D980FA", "#9980FA"), 
+          palette = c("#AFF927", "#962A50"), 
           title = "Mushroom's Habitat", label = TRUE, label.pos = "out")
