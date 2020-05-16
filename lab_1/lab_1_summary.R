@@ -420,7 +420,7 @@ stalk_surface_above_ring_df <- data.frame(stalk_surface_above_ring=rep(c("fibrou
 # Separated plot by "edible" & "poisonous"
 ggbarplot(stalk_surface_above_ring_df, x = "stalk_surface_above_ring", y = "n_mushrooms", xlab=c("Stalk Surface Above Ring"), ylab="# of Mushrooms", 
           fill="type", color="type", position = position_dodge(0.8), lab.col = "type",
-          palette = c("#D980FA", "#9980FA"), 
+          palette = c("#F48D11", "#76260F"), 
           title = "Mushroom's Stalk Surface Above Ring", label = TRUE, label.pos = "out")
 
 
@@ -447,12 +447,12 @@ print(stalk_surface_below_ring_percent)
 stalk_surface_below_ring_df <- data.frame(stalk_surface_below_ring=rep(c("fibrous", "silky", "smooth", "scaly"), each = 2), 
                                           n_mushrooms=c(stalk_surface_below_ring_table[,1], stalk_surface_below_ring_table[,2], stalk_surface_below_ring_table[,3], stalk_surface_below_ring_table[,4]),
                                           type=rep(c("edible", "poisonous"), each = 1))
-View(stalk_surface_below_ring_df)
+
 # Barplot of stalk_surface_above_ring
 # Separated plot by "edible" & "poisonous"
 ggbarplot(stalk_surface_below_ring_df, x = "stalk_surface_below_ring", y = "n_mushrooms", xlab=c("Stalk Surface Below Ring"), ylab="# of Mushrooms", 
           fill="type", color="type", position = position_dodge(0.8), lab.col = "type",
-          palette = c("#D980FA", "#9980FA"), 
+          palette = c("#0F9612", "#960F67"), 
           title = "Mushroom's Stalk Surface Below Ring", label = TRUE, label.pos = "out")
 print(stalk_surface_below_ring_table)
 
