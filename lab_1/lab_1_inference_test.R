@@ -6,6 +6,9 @@ library(ggpubr)
 # Load dplyr to handle classes in columns
 library(dplyr)
 
+#To group levels when necesary
+library(rockchalk)
+
 # Set working directory
 # change as needed
 workdir_path <- "~/code/github.com/HectorPerezM/lab_ic_2020/lab_1"
@@ -20,34 +23,44 @@ data <- read.csv(dataset_path, header = FALSE)
 # Rename columns for better comprehension
 names(data) <- c("type", "cap_shape", "cap_surface", "cap_color", "has_bruises", "odor", "gill_attachment", "gill_spacing", "gill_size", "gill_color", "stalk_shape", "stalk_root", "stalk_surface_above_ring", "stalk_surface_below_ring", "stalk_color_above_ring", "stalk_color_below_ring", "veil_type", "veil_color", "ring_number", "ring_type", "spore_print_color", "population", "habitat")
 
+# ---------- Cleaning data -------------------------
+
+# Eliminate cap_surface -> grooves obs
+data <- droplevels(data[-which(data$cap_surface == "g"),])
+
+# In var cap_color
+#Regroup categories: "b", "c", "r", "p", "u"
+data$cap_color <- as.character(data$cap_color)
+data$cap_color <- factor( with(data, replace(cap_color, cap_color %in% c( "b", "c", "r", "p", "u"), "o")))
+
+#data$stalk_root <- as.character(data$stalk_root)
+#data$stalk_root <- factor( with(data, replace(stalk_color, stalk_color %in% c( "b", "c", "r", "p", "u"), "o")))
+
+# In var stalk_surface_above_ring
+# regroup in others (o) categories fibrous (f) and scaly (y)
+data$stalk_surface_above_ring <- as.character(data$stalk_surface_above_ring)
+data$stalk_surface_above_ring <- factor( with(data, replace(stalk_surface_above_ring, stalk_surface_above_ring %in% c( "f", "y"), "o")))
+
+# In var stalk_surface_below_ring
+# regroup in others (o) categories fibrous (f) and scaly (y)
+data$stalk_surface_below_ring <- as.character(data$stalk_surface_below_ring)
+data$stalk_surface_below_ring <- factor( with(data, replace(stalk_surface_below_ring, stalk_surface_below_ring %in% c( "f", "y"), "o")))
+
+#-----------------------------------------------------
+
 
 
 # Chi2 Test on variables
-
-#REVISAR RAZONAMIENTO, PUEDE ESTAR MALO !!!
-
 # Necesitamos conocer que variables se relacionan con nuestra variable a predecir, que en este caso es si es comestible o no (data$type)
 # para ello realizamos un test de chi2 por cada par de variables, es decir, en cada uno testeamos la hipotesis nula que sería:
 
-# H0: La variable data$type y la variable data$<resto de variables> son independientes 
-# H1: La variable data$type y la variable data$<resto de variables> son dependientes
+# H0: La variable data$type y la variable data$<x_variables> son independientes 
+# H1: La variable data$type y la variable data$<x_variables> son dependientes
 
-# Es importante conocer que variables son dependientes con nuestra variable a predecir, así sabemos realmente
-# cuales de ellas influencian a los algoritmos que implementaremos a futuro.
+# Con un p-value = 0.05, si es menor se rechaza la hipotesis nula y se acepta la hipotesis 1
 
-column_names <- c("type", "cap_shape", "cap_surface", "cap_color", "has_bruises")
-x <- column_names[1]
-print(data$x)
-numberColumns <- length(column_names)
-
-test <- function(names) {
-  for (i in 1:length(names)) {
-    print(data[names[i]])
-  }
-}
-
-test(column_names)
-
+#Funcion que realiza un test de chi2 a todas las variables de dataset
+#filtra la variable veil_type debido a que como presenta 1 solo nivel, arroja un error al momento de realizar el test
 chisqTestToDataset <- function(toTestName, toTest) {
   for(i in 1:length(names(data))) {
     #Filtro veil_type debido a que solo posee 1 level
@@ -59,15 +72,18 @@ chisqTestToDataset <- function(toTestName, toTest) {
   }
 }
 
+#Llamamos a la funcion, le entregamos los parametros
 chisqTestToDataset("Type", data$type)
 
-## ANOTAR SALIDA EN EXCEL Y ORDENAR!!!!
+# Excel con resultados ordenados: https://docs.google.com/spreadsheets/d/16Ku-c6ySvrFHFqivhdIiomCuOsa_ZYPzJOHVYyqro1I/edit?usp=sharing
 
-cat(data$type)
-print(length(names(data)))
-print(names(data[2]))
+# Cramer test
 
-x <- chisq.test(data$type, data$cap_surface)
-
-print(x$statistic[1])
-
+# Regresion Logistica
+logit <- glm(formula = type ~ cap_shape + cap_surface + cap_color + has_bruises + 
+                              odor + gill_attachment + gill_spacing + gill_size + 
+                              gill_color + stalk_shape + stalk_root + stalk_surface_above_ring +
+                              stalk_surface_below_ring + stalk_color_above_ring + stalk_color_below_ring +
+                              veil_color + ring_number + ring_type + spore_print_color + 
+                              population + habitat, data = data, family = "binomial")
+summary(logit)

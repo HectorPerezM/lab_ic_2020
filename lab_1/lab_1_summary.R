@@ -6,6 +6,10 @@ library(ggpubr)
 # Load dplyr to handle classes in columns
 library(dplyr)
 
+#To group levels when necesary
+library(rockchalk)
+
+
 # Set working directory
 # change as needed
 workdir_path <- "~/code/github.com/HectorPerezM/lab_ic_2020/lab_1"
@@ -42,6 +46,31 @@ ncol(data)
 # N° rows dataset
 nrow(data)
 
+
+# ---------- Cleaning data -------------------------
+
+# Eliminate cap_surface -> grooves obs
+data <- droplevels(data[-which(data$cap_surface == "g"),])
+
+# In var cap_color
+#Regroup categories: "b", "c", "r", "p", "u"
+data$cap_color <- as.character(data$cap_color)
+data$cap_color <- factor( with(data, replace(cap_color, cap_color %in% c( "b", "c", "r", "p", "u"), "o")))
+
+#data$stalk_root <- as.character(data$stalk_root)
+#data$stalk_root <- factor( with(data, replace(stalk_color, stalk_color %in% c( "b", "c", "r", "p", "u"), "o")))
+
+# In var stalk_surface_above_ring
+# regroup in others (o) categories fibrous (f) and scaly (y)
+data$stalk_surface_above_ring <- as.character(data$stalk_surface_above_ring)
+data$stalk_surface_above_ring <- factor( with(data, replace(stalk_surface_above_ring, stalk_surface_above_ring %in% c( "f", "y"), "o")))
+
+# In var stalk_surface_below_ring
+# regroup in others (o) categories fibrous (f) and scaly (y)
+data$stalk_surface_below_ring <- as.character(data$stalk_surface_below_ring)
+data$stalk_surface_below_ring <- factor( with(data, replace(stalk_surface_below_ring, stalk_surface_below_ring %in% c( "f", "y"), "o")))
+
+
 # ---------- Analysis type -------------------------
 # type:
 #   e -> edible
@@ -65,7 +94,6 @@ ggbarplot(type_df, x = "type", y = "n_mushrooms", xlab=c("Type"), ylab="# of Mus
           fill="type", color="type", palette = c("#f6f578", "#06623b"), width = c(0.4, 0.4), 
           title = "Consumable Mushrooms", label = TRUE, label.pos = "out")
 
-
 # ---------- Analysis cap_shape -------------------------
 # cap_shape:
 #   b -> bell     x -> convex k -> knobbed  
@@ -79,22 +107,20 @@ print(cap_shape_table)
 cap_shape_percentage <- 100*prop.table(table(data$cap_shape))
 print(cap_shape_percentage)
 
+
+# Group categories that have a few observations (bell, conical, knobbed, sunken)
+cap_shape_other <- cap_shape_table[,1] + cap_shape_table[,2] + cap_shape_table[,4] + cap_shape_table[,5] 
+
 # Dataframe formatted to create barplot of cap_shape
-cap_shape_df <- data.frame(cap_shape=rep(c("bell", "conical", "flat", "knobbed", "sunken", "convex"), each = 2), 
-                           n_mushrooms=c(cap_shape_table[,1], cap_shape_table[,2], cap_shape_table[,3], 
-                                         cap_shape_table[,4], cap_shape_table[,5], cap_shape_table[,6]),
+cap_shape_df <- data.frame(cap_shape=rep(c("flat", "convex", "other"), each = 2), 
+                           n_mushrooms=c(cap_shape_table[,3], cap_shape_table[,6], cap_shape_other),
                            type=rep(c("edible", "poisonous"), each = 1))
 
-# Barplot of cap_shape
-#ggbarplot(cap_shape_df, x = "cap_shape", y = "n_mushrooms", xlab=c("Cap Shapes"), ylab="# of Mushrooms", 
-#          fill="cap_shape", color="cap_shape", palette = c("#ffd31d", "#06623b", "#ffb385", "#ff7272", "#00a1ab", "#00263b"), 
-#          title = "Mushroom's Cap Shapes", label = TRUE, label.pos = "out")
-
 # Separated plot by "edible" & "poisonous
-ggbarplot(cap_shape_df, x = "cap_shape", y = "n_mushrooms", xlab=c("Cap Shapes"), ylab="# of Mushrooms", 
+ggbarplot(cap_shape_df, x = "cap_shape", y = "n_mushrooms", xlab=c("Cap Shape"), ylab="# of Mushrooms", 
           fill="type", color="type", position = position_dodge(0.8), lab.col = "type",
           palette = c("#27ae60", "#2c3e50"), 
-          title = "Mushroom's Cap Shapes", label = TRUE, label.pos = "out")
+          title = "Mushroom's Cap Shape", label = TRUE, label.pos = "out")
 
 
 # ---------- Analysis cap_surface -------------------------
@@ -112,9 +138,10 @@ cap_surface_percentage <- 100*prop.table(table(data$cap_surface))
 print(cap_surface_percentage)
 
 # Dataframe formatted to create barplot of cap_surface
-cap_surface_df <- data.frame(cap_surface=rep(c("fibrous", "grooves", "smooth", "scaly"), each = 2), 
-                           n_mushrooms=c(cap_surface_table[,1], cap_surface_table[,2], cap_surface_table[,3], 
-                                         cap_surface_table[,4]),
+# Category "grooves left out because only have 4 obs
+cap_surface_df <- data.frame(cap_surface=rep(c("fibrous", "smooth", "scaly"), each = 2), 
+                           n_mushrooms=c(cap_surface_table[,1], cap_surface_table[,2], 
+                                         cap_surface_table[,3]),
                            type=rep(c("edible", "poisonous"), each = 1))
 
 # Barplot of cap_surface
@@ -129,20 +156,21 @@ ggbarplot(cap_surface_df, x = "cap_surface", y = "n_mushrooms", xlab=c("Cap Surf
 # cap_color:
 #   b -> buff     e -> red   n -> brown  r -> green  w -> white 
 #   c -> cinnamon g -> gray  p -> pink   u -> purple y -> yellow
+#  new class others -> o contains buff, cinnamon, red, pink and purple
 
 #Count observation per class & type
 cap_color_table <- table(data$type, data$cap_color)
 print(cap_color_table)
 
-#TODO Considerar hacer un gráfico de torta para los % 
 # Get percentage of each class: "b", "c", "e", "g", "n", "p", "r", "u", "w", "y"
 cap_color_percentage <- 100*prop.table(table(data$cap_color))
 print(cap_color_percentage)
 
+
 # Dataframe formatted to create barplot of cap_color
-cap_color_df <- data.frame(cap_color=rep(c("buff", "cinnamon", "red", "gray", "brown", "pink", "green", "purple", "white", "yellow"), each = 2), 
-                             n_mushrooms=c(cap_color_table[,1], cap_color_table[,2], cap_color_table[,3], cap_color_table[,4], cap_color_table[,5],
-                                           cap_color_table[,6], cap_color_table[,7], cap_color_table[,8], cap_color_table[,9], cap_color_table[,10]),
+cap_color_df <- data.frame(cap_color=rep(c("red", "gray", "brown", "other", "white", "yellow"), each = 2), 
+                             n_mushrooms=c(cap_color_table[,1], cap_color_table[,2], cap_color_table[,3],
+                                           cap_color_table[,4], cap_color_table[,5], cap_color_table[,6]),
                              type=rep(c("edible", "poisonous"), each = 1))
 
 # Barplot of cap_color
@@ -162,8 +190,6 @@ ggbarplot(cap_color_df, x = "cap_color", y = "n_mushrooms", xlab=c("Cap Color"),
 has_bruises_table <- table(data$type, data$has_bruises)
 print(has_bruises_table)
 
-#TODO Considerar hacer un gráfico de torta para los % 
-#SACAR % DE LOS COMESTIBLES QUE TIENEN BRUISES ETC... 
 # Get percentage of each class: "f", "t"
 has_bruises_percentage <- 100*prop.table(table(data$has_bruises))
 print(has_bruises_percentage)
@@ -186,12 +212,12 @@ ggbarplot(has_bruises_df, x = "bruises", y = "n_mushrooms", xlab=c("Has Bruises"
 #   a -> almond   f -> foul   m -> musty  p -> pungent  y -> fishy 
 #   c -> creosote l -> anise  n -> none   s -> spicy 
 
+#No sé si reagrupar Odor debido a que es una de las variables más importantes en cuanto a clasificacion de si es comestible o no
+
 #Count observation per class & type
 odor_table <- table(data$type, data$odor)
 print(odor_table)
 
-#TODO Considerar hacer un gráfico de torta para los % 
-#SACAR % DE LOS COMESTIBLES QUE TIENEN ODOR X ETC... 
 # Get percentage of each class: "a", "c", "f", "l", "m", "n", "p", "s", "y"
 odor_percentage <- 100*prop.table(table(data$odor))
 print(odor_percentage)
@@ -228,16 +254,16 @@ gill_attachment_percentage <- 100*prop.table(table(data$gill_attachment))
 print(gill_attachment_percentage)
 
 # Dataframe formatted to create barplot of gill_attachment
-gill_attachment_df <- data.frame(gill_attachment=rep(c("attached", "free", "descending", "notched"), each = 2), 
-                      n_mushrooms=c(gill_attachment_table[,1], gill_attachment_table[,2], 0, 0, 0, 0),
+gill_attachment_df <- data.frame(gill_attachment=rep(c("attached", "free"), each = 2), 
+                      n_mushrooms=c(gill_attachment_table[,1], gill_attachment_table[,2]),
                       type=rep(c("edible", "poisonous"), each = 1))
 
 # Barplot of gill_attachment
 # Separated plot by "edible" & "poisonous"
-ggbarplot(gill_attachment_df, x = "gill_attachment", y = "n_mushrooms", xlab=c("Mushroom's Gill Attachment"), ylab="# of Mushrooms", 
+ggbarplot(gill_attachment_df, x = "gill_attachment", y = "n_mushrooms", xlab=c("Gill Attachment"), ylab="# of Mushrooms", 
           fill="type", color="type", position = position_dodge(0.8), lab.col = "type",
           palette = c("#fd79a8", "#00cec9"), 
-          title = "Mushroom's Gill Atachment", label = TRUE, label.pos = "out")
+          title = "Mushroom's Gill Attachment", label = TRUE, label.pos = "out")
 
 
 # ---------- Analysis gill_spacing -------------------------
@@ -258,16 +284,16 @@ gill_spacing_percentage <- 100*prop.table(table(data$gill_spacing))
 print(gill_spacing_percentage)
 
 # Dataframe formatted to create barplot of gill_attachment
-gill_spacing_df <- data.frame(gill_spacing=rep(c("close", "crowded", "distant"), each = 2), 
-                              n_mushrooms=c(gill_spacing_table[,1], gill_spacing_table[,2], 0, 0),
+gill_spacing_df <- data.frame(gill_spacing=rep(c("close", "crowded"), each = 2), 
+                              n_mushrooms=c(gill_spacing_table[,1], gill_spacing_table[,2]),
                               type=rep(c("edible", "poisonous"), each = 1))
 
 # Barplot of gill_spacing
 # Separated plot by "edible" & "poisonous"
-ggbarplot(gill_spacing_df, x = "gill_spacing", y = "n_mushrooms", xlab=c("Mushroom's Gill Spacing"), ylab="# of Mushrooms", 
+ggbarplot(gill_spacing_df, x = "gill_spacing", y = "n_mushrooms", xlab=c("Gill Spacing"), ylab="# of Mushrooms", 
           fill="type", color="type", position = position_dodge(0.8), lab.col = "type",
           palette = c("#00b894", "#0984e3"), 
-          title = "Mushroom's Gill Spcing", label = TRUE, label.pos = "out")
+          title = "Mushroom's Gill Spacing", label = TRUE, label.pos = "out")
 
 
 # ---------- Analysis gill_size -------------------------
@@ -292,7 +318,7 @@ gill_size_df <- data.frame(gill_size=rep(c("broad", "narrow"), each = 2),
 
 # Barplot of gill_size
 # Separated plot by "edible" & "poisonous"
-ggbarplot(gill_size_df, x = "gill_size", y = "n_mushrooms", xlab=c("Mushroom's Gill Size"), ylab="# of Mushrooms", 
+ggbarplot(gill_size_df, x = "gill_size", y = "n_mushrooms", xlab=c("Gill Size"), ylab="# of Mushrooms", 
           fill="type", color="type", position = position_dodge(0.8), lab.col = "type",
           palette = c("#a29bfe", "#fdcb6e"), 
           title = "Mushroom's Gill Size", label = TRUE, label.pos = "out")
@@ -303,12 +329,13 @@ ggbarplot(gill_size_df, x = "gill_size", y = "n_mushrooms", xlab=c("Mushroom's G
 #   b -> buff  g -> gray       k -> black  o -> orange  r -> green   w -> white
 #   e -> red   h -> chocolate  n -> brown  p -> pink    u -> purple  y -> yellow
 
+# Se reagruparon las categorias: red, green, orange, yellow
+# Esto debido a que presentan pocas observaciones
+
 #Count observation per class & type
 gill_color_table <- table(data$type, data$gill_color)
 print(gill_color_table)
 
-#TODO Considerar hacer un gráfico de torta para los % 
-#SACAR % DE LOS COMESTIBLES QUE TIENEN ODOR X ETC... 
 # Get percentage of each class: "b", "e", "g", "h", "k", "n", "o", "p", "r", "u", "w", "y"
 gill_color_percentage <- 100*prop.table(table(data$gill_color))
 print(gill_color_percentage)
@@ -328,7 +355,7 @@ ggbarplot(gill_color_df %>% slice(1:12), x = "gill_color", y = "n_mushrooms", xl
           palette = c("#B53471", "#F79F1F"), 
           title = "Mushroom's Gill Color", label = TRUE, label.pos = "out")
 
-ggbarplot(gill_color_df %>% slice(12:24), x = "gill_color", y = "n_mushrooms", xlab=c("Color"), ylab="# of Mushrooms", 
+ggbarplot(gill_color_df %>% slice(13:24), x = "gill_color", y = "n_mushrooms", xlab=c("Color"), ylab="# of Mushrooms", 
           fill="type", color="type", position = position_dodge(0.8), lab.col = "type",
           palette = c("#B53471", "#F79F1F"), 
           title = "Mushroom's Gill Color", label = TRUE, label.pos = "out")
@@ -343,8 +370,6 @@ ggbarplot(gill_color_df %>% slice(12:24), x = "gill_color", y = "n_mushrooms", x
 stalk_shape_table <- table(data$type, data$stalk_shape)
 print(stalk_shape_table)
 
-#TODO Considerar hacer un gráfico de torta para los % 
-#SACAR % DE LOS COMESTIBLES QUE TIENEN ODOR X ETC... 
 # Get percentage of each class: "e", "t"
 stalk_shape_percentage <- 100*prop.table(table(data$stalk_shape))
 print(stalk_shape_percentage)
@@ -367,14 +392,14 @@ ggbarplot(stalk_shape_df, x = "stalk_shape", y = "n_mushrooms", xlab=c("Stalk Sh
 #   ? -> missing   c -> club   r -> rooted        u-> cup
 #   b -> bulbous   e -> equal  z -> rhizomorphs
 
+#Se reagrupa en categoria "others" las categorias: club, cup, rhizomorphs y rooted
+
 #Notar que el dataset no posee observaciones para las categorias "z", "u" (!)
 
 #Count observation per class & type
 stalk_root_table <- table(data$type, data$stalk_root)
 print(stalk_root_table)
 
-#TODO Considerar hacer un gráfico de torta para los % 
-#SACAR % DE LOS COMESTIBLES QUE TIENEN ODOR X ETC... 
 # Get percentage of each class: "?", "b", "c", "e", "r", "z", "u"
 stalk_root_percentage <- 100*prop.table(table(data$stalk_root))
 print(stalk_root_percentage)
@@ -399,20 +424,20 @@ ggbarplot(stalk_root_df, x = "stalk_root", y = "n_mushrooms", xlab=c("Stalk Root
 #   f -> fibrous   y -> scaly  
 #   k -> silky     s -> smooth  
 
+#Se reagrupan las categorias fibrous y scaly debido a que poseen pocas observaciones
+# en others (o) -> f, y
 
 #Count observation per class & type
 stalk_surface_above_ring_table <- table(data$type, data$stalk_surface_above_ring)
 print(stalk_surface_above_ring_table)
 
-#TODO Considerar hacer un gráfico de torta para los % 
-#SACAR % DE LOS COMESTIBLES QUE TIENEN ODOR X ETC... 
 # Get percentage of each class: "f", "y", "k", "s"
 stalk_surface_above_ring_percent <- 100*prop.table(table(data$stalk_surface_above_ring))
 print(stalk_surface_above_ring_percent)
 
 # Dataframe formatted to create barplot of stalk_surface_above_ring
-stalk_surface_above_ring_df <- data.frame(stalk_surface_above_ring=rep(c("fibrous", "silky", "smooth", "scaly"), each = 2), 
-                                          n_mushrooms=c(stalk_surface_above_ring_table[,1], stalk_surface_above_ring_table[,2], stalk_surface_above_ring_table[,3], stalk_surface_above_ring_table[,4]),
+stalk_surface_above_ring_df <- data.frame(stalk_surface_above_ring=rep(c("silky", "other", "smooth"), each = 2), 
+                                          n_mushrooms=c(stalk_surface_above_ring_table[,1], stalk_surface_above_ring_table[,2], stalk_surface_above_ring_table[,3]),
                                           type=rep(c("edible", "poisonous"), each = 1))
 
 
@@ -423,10 +448,6 @@ ggbarplot(stalk_surface_above_ring_df, x = "stalk_surface_above_ring", y = "n_mu
           palette = c("#F48D11", "#76260F"), 
           title = "Mushroom's Stalk Surface Above Ring", label = TRUE, label.pos = "out")
 
-
-
-
-
 # ---------- Analysis stalk_surface_below_ring -------------------------
 # stalk_surface_below_ring:
 #   f -> fibrous   y -> scaly  
@@ -436,16 +457,14 @@ ggbarplot(stalk_surface_above_ring_df, x = "stalk_surface_above_ring", y = "n_mu
 stalk_surface_below_ring_table <- table(data$type, data$stalk_surface_below_ring)
 print(stalk_surface_below_ring_table)
 
-#TODO Considerar hacer un gráfico de torta para los % 
-#SACAR % DE LOS COMESTIBLES QUE TIENEN ODOR X ETC... 
 # Get percentage of each class: "f", "y", "k", "s"
 stalk_surface_below_ring_percent <- 100*prop.table(table(data$stalk_surface_below_ring))
 print(stalk_surface_below_ring_percent)
 
 
 # Dataframe formatted to create barplot of stalk_surface_above_ring
-stalk_surface_below_ring_df <- data.frame(stalk_surface_below_ring=rep(c("fibrous", "silky", "smooth", "scaly"), each = 2), 
-                                          n_mushrooms=c(stalk_surface_below_ring_table[,1], stalk_surface_below_ring_table[,2], stalk_surface_below_ring_table[,3], stalk_surface_below_ring_table[,4]),
+stalk_surface_below_ring_df <- data.frame(stalk_surface_below_ring=rep(c("silky", "other", "smooth"), each = 2), 
+                                          n_mushrooms=c(stalk_surface_below_ring_table[,1], stalk_surface_below_ring_table[,2], stalk_surface_below_ring_table[,3]),
                                           type=rep(c("edible", "poisonous"), each = 1))
 
 # Barplot of stalk_surface_above_ring
@@ -467,8 +486,6 @@ print(stalk_surface_below_ring_table)
 stalk_color_above_ring_table <- table(data$type, data$stalk_color_above_ring)
 print(stalk_color_above_ring_table)
 
-#TODO Considerar hacer un gráfico de torta para los % 
-#SACAR % DE LOS COMESTIBLES QUE TIENEN ODOR X ETC... 
 # Get percentage of each class: "n", "b", "c", "e", "y", "g", "o", "p", "w"
 stalk_color_above_ring_percent <- 100*prop.table(table(data$stalk_color_above_ring))
 print(stalk_color_above_ring_percent)
@@ -499,8 +516,6 @@ ggbarplot(stalk_color_above_ring_df, x = "stalk_color_above_ring", y = "n_mushro
 stalk_color_below_ring_table <- table(data$type, data$stalk_color_below_ring)
 print(stalk_color_below_ring_table)
 
-#TODO Considerar hacer un gráfico de torta para los % 
-#SACAR % DE LOS COMESTIBLES QUE TIENEN ODOR X ETC... 
 # Get percentage of each class: "n", "b", "c", "e", "y", "g", "o", "p", "w"
 stalk_color_below_ring_percent <- 100*prop.table(table(data$stalk_color_below_ring))
 print(stalk_color_below_ring_percent)
@@ -529,6 +544,10 @@ veil_type_table <- table(data$type, data$veil_type)
 print(veil_type_table)
 
 #Este atributo solo posee registros p -> partial
+ggbarplot(stalk_color_below_ring_df, x = "stalk_color_below_ring", y = "n_mushrooms", xlab=c("Stalk Color Below Ring"), ylab="# of Mushrooms", 
+          fill="type", color="type", position = position_dodge(0.8), lab.col = "type",
+          palette = c("#19D0BC", "#442783"), 
+          title = "Mushroom's Stalk Color Below Ring", label = TRUE, label.pos = "out")
 
 
 # ---------- Analysis veil_color  -------------------------
@@ -536,13 +555,10 @@ print(veil_type_table)
 #   n -> brown      o -> orange
 #   w -> white      y -> yellow
 
-
 #Count observation per class & type
 veil_color_table <- table(data$type, data$veil_color)
 print(veil_color_table)
 
-#TODO Considerar hacer un gráfico de torta para los % 
-#SACAR % DE LOS COMESTIBLES QUE TIENEN ODOR X ETC... 
 # Get percentage of each class: "n", "o", "w", "y"
 veil_color_percent <- 100*prop.table(table(data$veil_color))
 print(veil_color_percent)
@@ -573,8 +589,6 @@ ggbarplot(veil_color_df, x = "veil_color", y = "n_mushrooms", xlab=c("Veil Color
 ring_number_table <- table(data$type, data$ring_number)
 print(ring_number_table)
 
-#TODO Considerar hacer un gráfico de torta para los % 
-#SACAR % DE LOS COMESTIBLES QUE TIENEN ODOR X ETC... 
 # Get percentage of each class: "n", "o", "t"
 ring_number_percent <- 100*prop.table(table(data$ring_number))
 print(ring_number_percent)
@@ -599,14 +613,10 @@ ggbarplot(ring_number_df, x = "ring_number", y = "n_mushrooms", xlab=c("Ring Num
 #   c ->  cobwebby     e -> evanescent    f -> flaring    s -> sheathing
 #   l -> large         n -> none          p -> pendant    z -> zone
 
-
-
 #Count observation per class & type
 ring_type_table <- table(data$type, data$ring_type)
 print(ring_type_table)
 
-#TODO Considerar hacer un gráfico de torta para los % 
-#SACAR % DE LOS COMESTIBLES QUE TIENEN ODOR X ETC... 
 # Get percentage of each class: "n", "o", "t"
 ring_type_percent <- 100*prop.table(table(data$ring_type))
 print(ring_type_percent)
