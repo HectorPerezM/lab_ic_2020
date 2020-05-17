@@ -9,6 +9,12 @@ library(dplyr)
 #To group levels when necesary
 library(rockchalk)
 
+#To plot correlation matrix
+library(tidyverse)
+
+#Statistical tools
+library(lsr)
+
 # Set working directory
 # change as needed
 workdir_path <- "~/code/github.com/HectorPerezM/lab_ic_2020/lab_1"
@@ -78,6 +84,33 @@ chisqTestToDataset("Type", data$type)
 # Excel con resultados ordenados: https://docs.google.com/spreadsheets/d/16Ku-c6ySvrFHFqivhdIiomCuOsa_ZYPzJOHVYyqro1I/edit?usp=sharing
 
 # Cramer test
+
+df = data
+
+# funcion para obtener Cramers V
+f = function(x,y) {
+  tbl = df %>% select(x,y) %>% table()
+  cramV = round(cramersV(tbl), 2) 
+  data.frame(x, y, cramV) }
+
+# Se crea la combinación de nombres de columnas
+df_comb = data.frame(t(combn(sort(names(df)), 2)), stringsAsFactors = F)
+
+# aplicando la función para cada combinacion de variables
+df_res = map2_df(df_comb$X1, df_comb$X2, f)
+
+# ploteando resultados
+df_res %>%
+  ggplot(aes(x,y,fill=cramV))+
+  geom_tile()+
+  geom_text(aes(x,y,label=cramV))+
+  scale_fill_gradient(low="green", high="red")
+
+#Filtrando y ordenando por mayor correlacion respecto a type
+cramer_filter = filter(df_res,x == "type")
+cramer_filter1 = filter(df_res, y== "type")
+cramer_filter = rbind(df_res, cramer_filter1)
+setorder(cramer_filter, -cramV)
 
 # Regresion Logistica
 logit <- glm(formula = type ~ cap_shape + cap_surface + cap_color + has_bruises + 
