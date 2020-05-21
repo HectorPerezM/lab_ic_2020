@@ -398,7 +398,9 @@ ggbarplot(stalk_shape_df, x = "stalk_shape", y = "n_mushrooms", xlab=c("Stalk Sh
 
 #Count observation per class & type
 stalk_root_table <- table(data$type, data$stalk_root)
-print(stalk_root_table)
+
+#Amount of missing values: stalk_root -> missing (?)
+print(sum(stalk_root_table)/2480)
 
 # Get percentage of each class: "?", "b", "c", "e", "r", "z", "u"
 stalk_root_percentage <- 100*prop.table(table(data$stalk_root))
