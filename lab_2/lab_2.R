@@ -8,6 +8,9 @@ library(rockchalk)
 #Libreria requerida para realizar la 2da experiencia
 library(cluster)
 
+# clustering algorithms & visualization
+library(factoextra)
+
 # Para realizar 'one-hot encoding'
 library(caret)
 
@@ -37,21 +40,6 @@ names(data) <- c("type", "cap_shape", "cap_surface", "cap_color", "has_bruises",
 
 # Pre-procesamiento
 
-# Debido a qeu 'veil_type' solo posee observaciones de 1 categoría, no nos aporta nada relevante
-# por lo tanto se decide eliminar esa columna.
-data$veil_type <- NULL
-
-# Se sabe, de la experiencia anterior, que 'stalk_root' posee una categoría llamada 'missing', por lo que se decide 
-# hacer experimentos de k-mean con 2 dataset, uno que contenga las observaciones de 'missing' y otro que no.
-
-# Entonces:
-#     data_ro no contiene las observaciones con stalk_root = ?
-#     data contiene las obv. con stalk_root = ?
-#
-# https://stackoverflow.com/questions/52120149/how-to-delete-rows-of-data-within-a-certain-category-in-r
-data_ro <- data %>% filter(data$stalk_root != "?")
-
-
 # Transformamos las categorias para que sean legibles
 # https://stackoverflow.com/questions/29711067/how-to-change-name-of-factor-levels
 
@@ -79,16 +67,42 @@ levels(data$population) <- c('abundant', 'clustered', 'numerous', 'scattered', '
 levels(data$habitat) <- c('woods', 'grasses', 'leaves', 'meadows', 'paths', 'urban', 'waste')
 
 
+
+
+# Debido a que 'veil_type' solo posee observaciones de 1 categoría, no nos aporta nada relevante
+# por lo tanto se decide eliminar esa columna. Además, k-mean arroja un error si una variable posee solo 
+# 1 level
+
+data <- data[,-17]
+data_clean <- data[,-17]
+
+
+# Se sabe, de la experiencia anterior, que 'stalk_root' posee una categoría llamada 'missing', por lo que se decide 
+# hacer experimentos de k-mean con 2 dataset, uno que contenga las observaciones de 'missing' y otro que no.
+# Entonces:
+#     data_ro no contiene las observaciones con stalk_root = ?
+#     data contiene las obv. con stalk_root = ?
+#
+# https://stackoverflow.com/questions/52120149/how-to-delete-rows-of-data-within-a-certain-category-in-r
+# https://rpubs.com/m3cinc/Machine_Learning_Classification_Challenges
+# https://uc-r.github.io/kmeans_clustering#prep
+
+data_clean$stalk_root[data_clean$stalk_root == 'missing'] <- NA
+data_clean <- na.omit(data_clean)
+data_clean$stalk_root <- factor(data_clean$stalk_root)
+
+#data_clean <- data %>% filter(data$stalk_root != "?")
+
 # Debido a que pam trabaja solo con valores numericos debemos encodear nuestras categorias, para ello no valemos
 # del metodo "one-hot-encoding"
 # https://medium.com/@jboscomendoza/variables-dummy-one-hot-encoding-con-r-1f62b4ec8242
 # https://stackoverflow.com/questions/48649443/how-to-one-hot-encode-several-categorical-variables-in-r
 
 dummy <- dummyVars("~ .", data = data)
-dummy_ro <- dummyVars("~ .", data = data_ro)
+dummy_clean <- dummyVars("~ .", data = data_clean)
 
 data_tf <- data.frame(predict(dummy, newdata = data))
-data_ro_tf <- data.frame(predict(dummy_ro, newdata = data_ro))
+data_clean_tf <- data.frame(predict(dummy_clean, newdata = data_clean))
 
 
 
@@ -96,8 +110,41 @@ data_ro_tf <- data.frame(predict(dummy_ro, newdata = data_ro))
 # Clustering
 # Revisar:
 #     -> https://www.datanovia.com/en/lessons/k-means-clustering-in-r-algorith-and-practical-examples/
-#     ->  
+#     -> https://uc-r.github.io/kmeans_clustering
+#     ->
 
+
+#Para que los experimentos sean reproducibles
+set.seed(150)
+
+# K-Mean
+#Para todo el dataset
+kmeans_result <- kmeans(x = data_tf, centers = 2, iter.max = 50, nstart = 1)
+table(data$type, kmeans_result$cluster)
+
+# Plotear grafico de barras de los resultados igual 
+
+kmeans_result$cluster
+kmeans_result$withinss
+kmeans_result$centers
+
+#Visualization
+fviz_cluster(kmeans_result, data = data_tf, main = "Complete Dataset Cluster Plot")
+
+
+#Para el dataset limpio
+kmeans_result_clean <- kmeans(x = data_clean_tf, centers = 2, iter.max = 50, nstart = 1)
+table(data_clean$type, kmeans_result_clean$cluster)
+
+# Plotear grafico de barras de los resultados igual 
+
+# Chequea columnas con varianza 0
+which(apply(data_clean_tf, 2, var) == 0)
+# Remuevo esas columnas debido a que
+# el gráfico me pide que no pueden no tener varianza
+data_clean_tf <- data_clean_tf[- as.numeric(which(apply(data_clean_tf, 2, var) == 0))]
+
+fviz_cluster(kmeans_result_clean, data = data_clean_tf, main = "Clean Dataset Cluster Plot")
 
 # PAM 
 #   -> https://es.wikipedia.org/wiki/K-medoids
