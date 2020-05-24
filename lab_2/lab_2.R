@@ -17,7 +17,7 @@ library(caret)
 
 # Set working directory
 # change as needed
-workdir_path <- "~/code/github.com/HectorPerezM/lab_ic_2020/lab_1"
+workdir_path <- "~/code/github.com/HectorPerezM/lab_ic_2020/lab_2"
 setwd(workdir_path)
 
 # Dataset path
@@ -70,11 +70,10 @@ levels(data$habitat) <- c('woods', 'grasses', 'leaves', 'meadows', 'paths', 'urb
 
 
 # Debido a que 'veil_type' solo posee observaciones de 1 categoría, no nos aporta nada relevante
-# por lo tanto se decide eliminar esa columna. Además, k-mean arroja un error si una variable posee solo 
-# 1 level
+# por lo tanto se decide eliminar esa columna. Además, k-mean arroja un error si una variable posee solo1 level
 
 data <- data[,-17]
-data_clean <- data[,-17]
+#data_clean <- data[,-17]
 
 
 # Se sabe, de la experiencia anterior, que 'stalk_root' posee una categoría llamada 'missing', por lo que se decide 
@@ -87,9 +86,11 @@ data_clean <- data[,-17]
 # https://rpubs.com/m3cinc/Machine_Learning_Classification_Challenges
 # https://uc-r.github.io/kmeans_clustering#prep
 
-data_clean$stalk_root[data_clean$stalk_root == 'missing'] <- NA
-data_clean <- na.omit(data_clean)
-data_clean$stalk_root <- factor(data_clean$stalk_root)
+#data_clean$stalk_root[data_clean$stalk_root == 'missing'] <- NA
+#data_clean <- na.omit(data_clean)
+#data_clean$stalk_root <- factor(data_clean$stalk_root)
+
+
 
 #data_clean <- data %>% filter(data$stalk_root != "?")
 
@@ -99,10 +100,10 @@ data_clean$stalk_root <- factor(data_clean$stalk_root)
 # https://stackoverflow.com/questions/48649443/how-to-one-hot-encode-several-categorical-variables-in-r
 
 dummy <- dummyVars("~ .", data = data)
-dummy_clean <- dummyVars("~ .", data = data_clean)
+#dummy_clean <- dummyVars("~ .", data = data_clean)
 
-data_tf <- data.frame(predict(dummy, newdata = data))
-data_clean_tf <- data.frame(predict(dummy_clean, newdata = data_clean))
+data_ohe <- data.frame(predict(dummy, newdata = data))
+#data_clean_tf <- data.frame(predict(dummy_clean, newdata = data_clean))
 
 
 
@@ -118,40 +119,46 @@ data_clean_tf <- data.frame(predict(dummy_clean, newdata = data_clean))
 set.seed(150)
 
 # K-Mean
-#Para todo el dataset
-kmeans_result <- kmeans(x = data_tf, centers = 2, iter.max = 50, nstart = 1)
-table(data$type, kmeans_result$cluster)
+kmeans_result <- kmeans(x = data_ohe, centers = 2, iter.max = 15, nstart = 50)
+kmeans_table  <- table(data$type, kmeans_result$cluster)
+print(kmeans_table)
 
-# Plotear grafico de barras de los resultados igual 
 
-kmeans_result$cluster
-kmeans_result$withinss
-kmeans_result$centers
+kmeans_df <- data.frame(cluster=rep(c("1", "2"), each=2), n_mushrooms=c(kmeans_table[,1], kmeans_table[,2]),  type=rep(c("edible", "poisonous"), each = 1))
+
+# Barplot of K-Mean Result
+ggbarplot(kmeans_df, x = "cluster", y = "n_mushrooms", xlab=c("Cluster"), ylab="# of Mushrooms", 
+          fill="type", color="type", position = position_dodge(0.8), lab.col = "type",
+          palette = c("#AAF338", "#CB25B6"), 
+          title = "K-Mean Result", label = TRUE, label.pos = "out")
+
+
 
 #Visualization
-fviz_cluster(kmeans_result, data = data_tf, main = "Complete Dataset Cluster Plot")
+fviz_cluster(kmeans_result, data = data_ohe, main = "K-Means Cluster Plot")
 
-
-#Para el dataset limpio
-kmeans_result_clean <- kmeans(x = data_clean_tf, centers = 2, iter.max = 50, nstart = 1)
-table(data_clean$type, kmeans_result_clean$cluster)
-
-# Plotear grafico de barras de los resultados igual 
-
-# Chequea columnas con varianza 0
-which(apply(data_clean_tf, 2, var) == 0)
-# Remuevo esas columnas debido a que
-# el gráfico me pide que no pueden no tener varianza
-data_clean_tf <- data_clean_tf[- as.numeric(which(apply(data_clean_tf, 2, var) == 0))]
-
-fviz_cluster(kmeans_result_clean, data = data_clean_tf, main = "Clean Dataset Cluster Plot")
 
 # PAM 
 #   -> https://es.wikipedia.org/wiki/K-medoids
 #   con F1 puedes ver la def. de la funcion
 
+pam_result <- pam(x = data_ohe, k = 2)
+
+fviz_nbclust(data_ohe, kmeans, method = 'silhouette')
 
 
+#Chequear esto
+fviz_nbclust(data_ohe, pam)
 
 
-
+#gower_dist <- daisy(data_clean_tf, metric = 'gower')
+#gower_mat <- as.matrix(gower_dist)
+#sil_width <- c(NA)
+#for(i in 2:8){  
+#  pam_fit <- pam(gower_dist, diss = TRUE, k = i)  
+#  sil_width[i] <- pam_fit$silinfo$avg.width  
+#}
+#plot(1:8, sil_width,
+#     xlab = "Number of clusters",
+#     ylab = "Silhouette Width")
+#lines(1:8, sil_width)
