@@ -33,7 +33,7 @@ names(data) <- c("type", "cap_shape", "cap_surface", "cap_color", "has_bruises",
 # Extraer el conocimiento del problema asignado, obteniendo mediante el software R, utilizando el
 # algoritmo de clustering K-means y realizar el análisis respectivo. Luego debe comparar con los
 # resultados revisados en la literatura encontrada y ver si se sustenta el conocimiento obtenido.
-# Para ello se debe identificar el número de grupos a generar (en base a un criterio que usted
+# Para ello se debe identificar el número de grupos a generar (en base a un criterio que usted  
 # defina). Luego se debe realizar el análisis (centroides) e identificar qué características podrían
 # estar asociadas a una u otra clase.
 
@@ -67,8 +67,6 @@ levels(data$population) <- c('abundant', 'clustered', 'numerous', 'scattered', '
 levels(data$habitat) <- c('woods', 'grasses', 'leaves', 'meadows', 'paths', 'urban', 'waste')
 
 
-
-
 # Debido a que 'veil_type' solo posee observaciones de 1 categoría, no nos aporta nada relevante
 # por lo tanto se decide eliminar esa columna. Además, k-mean arroja un error si una variable posee solo1 level
 
@@ -90,18 +88,24 @@ data <- data[,-17]
 #data_clean <- na.omit(data_clean)
 #data_clean$stalk_root <- factor(data_clean$stalk_root)
 
+dummy <- dummyVars("~ .", data = data)
+#dummy_clean <- dummyVars("~ .", data = data_clean)
+data_ohe <- data.frame(predict(dummy, newdata = data))
 
+matriz.distancia <- daisy(data_ohe, metric = "gower")
+matrix.similutd<- as.matrix(matriz.distancia)
+
+# Eleguiendo el numero de grupos #.
+fviz_nbclust(matrix.similutd,kmeans,method="silhouette")
+# Optimo = 5 clusters 
 
 #data_clean <- data %>% filter(data$stalk_root != "?")
-
 # Debido a que pam trabaja solo con valores numericos debemos encodear nuestras categorias, para ello no valemos
 # del metodo "one-hot-encoding"
 # https://medium.com/@jboscomendoza/variables-dummy-one-hot-encoding-con-r-1f62b4ec8242
 # https://stackoverflow.com/questions/48649443/how-to-one-hot-encode-several-categorical-variables-in-r
-
 dummy <- dummyVars("~ .", data = data)
 #dummy_clean <- dummyVars("~ .", data = data_clean)
-
 data_ohe <- data.frame(predict(dummy, newdata = data))
 #data_clean_tf <- data.frame(predict(dummy_clean, newdata = data_clean))
 
