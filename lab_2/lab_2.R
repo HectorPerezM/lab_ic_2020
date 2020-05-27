@@ -21,7 +21,7 @@ workdir_path <- "~/code/github.com/HectorPerezM/lab_ic_2020/lab_2"
 setwd(workdir_path)
 
 # Dataset path
-dataset_path <- "../dataset/mushroom/agaricus-lepiota.data"
+#dataset_path <- "~/Desktop/Inteligencia/lab_ic_2020/dataset/mushroom/agaricus-lepiota.data"
 
 # Load dataset
 data <- read.csv(dataset_path, header = FALSE)
@@ -91,13 +91,22 @@ data <- data[,-17]
 dummy <- dummyVars("~ .", data = data)
 #dummy_clean <- dummyVars("~ .", data = data_clean)
 data_ohe <- data.frame(predict(dummy, newdata = data))
-
 matriz.distancia <- daisy(data_ohe, metric = "gower")
 matrix.similutd<- as.matrix(matriz.distancia)
-
 # Eleguiendo el numero de grupos #.
-fviz_nbclust(matrix.similutd,kmeans,method="silhouette")
-# Optimo = 5 clusters 
+
+
+
+#fviz_nbclust(matrix.similutd,kmeans,method="silhouette")
+# Optimo = 7 clusters 
+#fviz_nbclust(matrix.similutd,kmeans,method="gap")
+#fviz_nbclust(matrix.similutd,pam,method="silhouette")
+#fviz_nbclust(matrix.similutd,pam,method="gap")
+
+
+
+
+
 
 #data_clean <- data %>% filter(data$stalk_root != "?")
 # Debido a que pam trabaja solo con valores numericos debemos encodear nuestras categorias, para ello no valemos
