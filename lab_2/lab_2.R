@@ -129,7 +129,7 @@ graph.kmeans= fviz_cluster(kmeans.result
                                       geom = "point", 
                                       ellipse = TRUE, ellypse.type = "convex")
 graph.kmeans
-kmeans_table  <- table(data$type, kmeans_result$cluster)
+kmeans_table  <- table(data$type, kmeans.result$cluster)
 print(kmeans_table)
 
 
@@ -156,20 +156,154 @@ grupo.kmeans.1 <- summary(data[data$cluster.kmeans ==1,])
 grupo.kmeans.2 <- summary(data[data$cluster.kmeans ==2,])
 
 
-data["cluster.Pam"] <- pam.result$cluster
-grupo.pam.1 <- summary(data[data$cluster.pam ==1,])
-grupo.pam.2 <- summary(data[data$cluster.pam ==2,])
+
+grupo1.type <-ggplot(data=data[data$cluster.kmeans ==1,], aes(x=type,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs Type")
+grupo1.type
+
+grupo1.cap_shape<- ggplot(data=data[data$cluster.kmeans ==1,], aes(x=cap_shape,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs cap_shape")
+grupo1.cap_shape
+
+grupo1.cap_surface<- ggplot(data=data[data$cluster.kmeans ==1,], aes(x=cap_surface,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs cap_surface")
+grupo1.cap_surface
+
+grupo1.cap_color<- ggplot(data=data[data$cluster.kmeans ==1,], aes(x=cap_color,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs cap_color")
+grupo1.cap_color
+
+grupo1.has_bruises<- ggplot(data=data[data$cluster.kmeans ==1,], aes(x=has_bruises,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs has_bruises")
+grupo1.has_bruises
+
+
+grupo1.odor<- ggplot(data=data[data$cluster.kmeans ==1,], aes(x=odor,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs odor")
+grupo1.odor
+
+grupo1.gill_attachment<- ggplot(data=data[data$cluster.kmeans ==1,], aes(x=gill_attachment,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs gill_attachment")
+grupo1.gill_attachment
+
+gripo1.gill_spacing<- ggplot(data=data[data$cluster.kmeans ==1,], aes(x=gill_spacing,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs gill_spacing")
+gripo1.gill_spacing
+
+grupo1.gill_size <- ggplot(data=data[data$cluster.kmeans ==1,], aes(x=gill_size,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs gill_size")
+grupo1.gill_size
+
+grupo1.gill_color <- ggplot(data=data[data$cluster.kmeans ==1,], aes(x=gill_color,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs gill_color")
+grupo1.gill_color
+
+grupo1.stalk_shape<- ggplot(data=data[data$cluster.kmeans ==1,], aes(x=stalk_shape,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs stalk_shape")
+grupo1.stalk_shape
+
+
+grupo1.stalk_root<- ggplot(data=data[data$cluster.kmeans ==1,], aes(x=stalk_root,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs stalk_root")
+grupo1.stalk_root
+
+
+grupo1.stalk_surface_above_ring<- ggplot(data=data[data$cluster.kmeans ==1,], aes(x=stalk_surface_above_ring,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs stalk_surface_above_ring")
+grupo1.stalk_surface_above_ring
+
+grupo1.stalk_surface_below_ring<- ggplot(data=data[data$cluster.kmeans ==1,], aes(x=stalk_surface_below_ring,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs stalk_surface_below_ring")
+grupo1.stalk_surface_below_ring
+
+
+grupo1.stalk_color_above_ring<- ggplot(data=data[data$cluster.kmeans ==1,], aes(x=stalk_color_above_ring,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs stalk_color_above_ring")
+grupo1.stalk_color_above_ring
+
+grupo1.stalk_color_below_ring<- ggplot(data=data[data$cluster.kmeans ==1,], aes(x=stalk_color_below_ring,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs stalk_color_below_ring")
+grupo1.stalk_color_below_ring
+
+
+grupo1.veil_color<- ggplot(data=data[data$cluster.kmeans ==1,], aes(x=veil_color,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs veil_color")
+grupo1.veil_color
+
+grupo1.ring_number<- ggplot(data=data[data$cluster.kmeans ==1,], aes(x=ring_number,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs ring_number")
+grupo1.ring_number
+
+grupo1.ring_type<- ggplot(data=data[data$cluster.kmeans ==1,], aes(x=ring_type,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs ring_type")
+grupo1.ring_type
+
+grupo1.spore_print_color<- ggplot(data=data[data$cluster.kmeans ==1,], aes(x=spore_print_color,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs spore_print_color")
+grupo1.spore_print_color
+
+
+grupo1.population<- ggplot(data=data[data$cluster.kmeans ==1,], aes(x=population,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs population")
+grupo1.population
+
+grupo1.habitat<- ggplot(data=data[data$cluster.kmeans ==1,], aes(x=habitat,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs habitat")
+grupo1.habitat
 
 
 
-#gower_dist <- daisy(data_clean_tf, metric = 'gower')
-#gower_mat <- as.matrix(gower_dist)
-#sil_width <- c(NA)
-#for(i in 2:8){  
-#  pam_fit <- pam(gower_dist, diss = TRUE, k = i)  
-#  sil_width[i] <- pam_fit$silinfo$avg.width  
-#}
-#plot(1:8, sil_width,
-#     xlab = "Number of clusters",
-#     ylab = "Silhouette Width")
-#lines(1:8, sil_width)
+### GRUPO 2 #
+
+grupo2.type <-ggplot(data=data[data$cluster.kmeans ==2,], aes(x=type,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs type ")
+grupo2.type
+
+grupo2.cap_shape<- ggplot(data=data[data$cluster.kmeans ==2,], aes(x=cap_shape,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs cap_shape")
+grupo2.cap_shape
+
+grupo2.cap_surface<- ggplot(data=data[data$cluster.kmeans ==2,], aes(x=cap_surface,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs cap_surface ")
+grupo2.cap_surface
+
+grupo2.cap_color<- ggplot(data=data[data$cluster.kmeans ==2,], aes(x=cap_color,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs cap_color")
+grupo2.cap_color
+
+grupo2.has_bruises<- ggplot(data=data[data$cluster.kmeans ==2,], aes(x=has_bruises,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs has_bruises")
+grupo2.has_bruises
+
+
+grupo2.odor<- ggplot(data=data[data$cluster.kmeans ==2,], aes(x=odor,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs odor")
+grupo2.odor
+
+grupo2.gill_attachment<- ggplot(data=data[data$cluster.kmeans ==2,], aes(x=gill_attachment,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs gill_attachment")
+grupo2.gill_attachment
+
+gripo2.gill_spacing<- ggplot(data=data[data$cluster.kmeans ==2,], aes(x=gill_spacing,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs gill_spacing")
+gripo2.gill_spacing
+
+grupo2.gill_size <- ggplot(data=data[data$cluster.kmeans ==2,], aes(x=gill_size,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs gill_size")
+grupo2.gill_size
+
+grupo2.gill_color <- ggplot(data=data[data$cluster.kmeans ==2,], aes(x=gill_color,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs gill_color")
+grupo2.gill_color
+
+grupo2.stalk_shape<- ggplot(data=data[data$cluster.kmeans ==2,], aes(x=stalk_shape,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs stalk_shape")
+grupo2.stalk_shape
+
+
+grupo2.stalk_root<- ggplot(data=data[data$cluster.kmeans ==2,], aes(x=stalk_root,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs stalk_root")
+grupo2.stalk_root
+
+
+grupo2.stalk_surface_above_ring<- ggplot(data=data[data$cluster.kmeans ==2,], aes(x=stalk_surface_above_ring,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs stalk_surface_above_ring")
+grupo2.stalk_surface_above_ring
+
+grupo2.stalk_surface_below_ring<- ggplot(data=data[data$cluster.kmeans ==2,], aes(x=stalk_surface_below_ring,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs stalk_surface_below_ring")
+grupo2.stalk_surface_below_ring
+
+
+grupo2.stalk_color_above_ring<- ggplot(data=data[data$cluster.kmeans ==2,], aes(x=stalk_color_above_ring,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs stalk_color_above_ring")
+grupo2.stalk_color_above_ring
+
+grupo2.stalk_color_below_ring<- ggplot(data=data[data$cluster.kmeans ==2,], aes(x=stalk_color_below_ring,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs stalk_color_below_ring")
+grupo2.stalk_color_below_ring
+
+
+grupo2.veil_color<- ggplot(data=data[data$cluster.kmeans ==2,], aes(x=veil_color,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs veil_color")
+grupo2.veil_color
+
+grupo2.ring_number<- ggplot(data=data[data$cluster.kmeans ==2,], aes(x=ring_number,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs ring_number")
+grupo2.ring_number
+
+grupo2.ring_type<- ggplot(data=data[data$cluster.kmeans ==2,], aes(x=ring_type,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs ring_type")
+grupo2.ring_type
+
+grupo2.spore_print_color<- ggplot(data=data[data$cluster.kmeans ==2,], aes(x=spore_print_color,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs spore_print_color")
+grupo2.spore_print_color
+
+
+grupo2.population<- ggplot(data=data[data$cluster.kmeans ==2,], aes(x=population,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs population")
+grupo2.population
+
+grupo2.habitat<- ggplot(data=data[data$cluster.kmeans ==2,], aes(x=habitat,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs habitat")
+grupo2.habitat
+
+
+
