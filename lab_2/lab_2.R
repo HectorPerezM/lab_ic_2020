@@ -101,10 +101,10 @@
   # Eleguiendo el numero de grupos #.
   
   
-  
-  fviz_nbclust(mtrix.similutd,kmeans,method="silhouette")
+  ## descomentar ## 
+  #fviz_nbclust(matrix.similutd,kmeans,method="silhouette")
   # Optimo = 2 clusters 
-  fviz_nbclust(matrix.similutd,pam,method="silhouette")
+  #fviz_nbclust(matrix.similutd,pam,method="silhouette")
   # Optimo = 2 clusters 
   
 
@@ -133,22 +133,22 @@ kmeans_table  <- table(data$type, kmeans.result$cluster)
 print(kmeans_table)
 
 
-pam.result  = pam(x = matrix.similutd, k = 2)
+#pam.result  = pam(x = matrix.similutd, k = 2)
 
 
-graph.pam= fviz_cluster(pam.result
-                           , data =matrix.similutd, stand = TRUE,
-                           geom = "point", 
-                           ellipse = TRUE, ellypse.type = "convex")
-graph.pam
-pam_table  <- table(data$type, pam.result$cluster)
-print(pam_table)
+#graph.pam= fviz_cluster(pam.result
+#                           , data =matrix.similutd, stand = TRUE,
+#                           geom = "point", 
+#                           ellipse = TRUE, ellypse.type = "convex")
+#graph.pam
+#pam_table  <- table(data$type, pam.result$cluster)
+#print(pam_table)
 
 # PAM 
 #   -> https://es.wikipedia.org/wiki/K-medoids
 #   con F1 puedes ver la def. de la funcion
 
-pam_result <- pam(x = data_ohe, k = 2)
+#pam_result <- pam(x = data_ohe, k = 2)
 
 
 data["cluster.kmeans"] <- kmeans.result$cluster
