@@ -66,77 +66,43 @@ levels(data$population) <- c('abundant', 'clustered', 'numerous', 'scattered', '
 levels(data$habitat) <- c('woods', 'grasses', 'leaves', 'meadows', 'paths', 'urban', 'waste')
 
 
-
-
 # Debido a que 'veil_type' solo posee observaciones de 1 categoría, no nos aporta nada relevante
 # por lo tanto se decide eliminar esa columna. Además, k-mean arroja un error si una variable posee solo1 level
 data<-data[!(data$stalk_root == "missing"),]
 data <- data[,-17]
 
 dummy <- dummyVars("~ .", data = data)
-#dummy_clean <- dummyVars("~ .", data = data_clean)
 data_ohe <- data.frame(predict(dummy, newdata = data))
 
 
-#data_clean <- data[,-17]
-
-
-# Se sabe, de la experiencia anterior, que 'stalk_root' posee una categoría llamada 'missing', por lo que se decide 
-# hacer experimentos de k-mean con 2 dataset, uno que contenga las observaciones de 'missing' y otro que no.
-# Entonces:
-#     data_ro no contiene las observaciones con stalk_root = ?
-#     data contiene las obv. con stalk_root = ?
-#
-# https://stackoverflow.com/questions/52120149/how-to-delete-rows-of-data-within-a-certain-category-in-r
-# https://rpubs.com/m3cinc/Machine_Learning_Classification_Challenges
-# https://uc-r.github.io/kmeans_clustering#prep
-
-#data_clean$stalk_root[data_clean$stalk_root == 'missing'] <- NA
-#data_clean <- na.omit(data_clean)
-#data_clean$stalk_root <- factor(data_clean$stalk_root)
-
-
+# Matriz Simulitud usando Gower
 matriz.distancia <- daisy(data_ohe, metric = "gower")
 matrix.similutd<- as.matrix(matriz.distancia)
-# Eleguiendo el numero de grupos #.
 
+# Descomentar solo si se desea calcular el numero
+# optimo de grupos
+# Advertencia: Demora mucho tiempo
 
-## descomentar ## 
+#K-Means
 #fviz_nbclust(matrix.similutd,kmeans,method="silhouette")
-# Optimo = 2 clusters 
+# Resultado = 2 clusters 
+
+#PAM
 #fviz_nbclust(matrix.similutd,pam,method="silhouette")
-# Optimo = 2 clusters 
-
-
-
-
+# Resultado = 2 clusters 
 
 # ------------------------------
 # Clustering
-# Revisar:
-#     -> https://www.datanovia.com/en/lessons/k-means-clustering-in-r-algorith-and-practical-examples/
-#     -> https://uc-r.github.io/kmeans_clustering
-#     ->
-
+#-------------------------------
 
 #Para que los experimentos sean reproducibles
 set.seed(150)
 
-# K-Mean
-kmeans.result = kmeans(x = matrix.similutd, centers = 2)
+#K-Mean
 
+kmeans.result = kmeans(x = matrix.similutd, centers = 2)
 kmeans.3.result = kmeans(x = matrix.similutd, centers = 3)
 kmeans.4.result = kmeans(x = matrix.similutd, centers = 4)
-
-graph.kmeans.3 = fviz_cluster(kmeans.3.result
-                           , data =matrix.similutd, stand = TRUE,
-                           geom = "point", 
-                           ellipse = TRUE, ellypse.type = "convex")
-
-graph.kmeans.4 = fviz_cluster(kmeans.4.result
-                              , data =matrix.similutd, stand = TRUE,
-                              geom = "point", 
-                              ellipse = TRUE, ellypse.type = "convex")
 
 graph.kmeans= fviz_cluster(kmeans.result
                            , data =matrix.similutd, stand = TRUE,
@@ -153,39 +119,34 @@ graph.kmeans.4 = fviz_cluster(kmeans.4.result
                            geom = "point", 
                            ellipse = TRUE, ellypse.type = "convex")
 
-
+#Imprime graficos
 graph.kmeans
 graph.kmeans.3
 graph.kmeans.4
 
+#Tablas
 kmeans_table  <- table(data$type, kmeans.result$cluster)
-print(kmeans_table)
+kmeans_table_result3  <- table(data$type, kmeans.3.result$cluster)
+kmeans_table_result4  <- table(data$type, kmeans.4.result$cluster)
 
-
-#pam.result  = pam(x = matrix.similutd, k = 2)
-
-
-#graph.pam= fviz_cluster(pam.result
-#                           , data =matrix.similutd, stand = TRUE,
-#                           geom = "point", 
-#                           ellipse = TRUE, ellypse.type = "convex")
-#graph.pam
-#pam_table  <- table(data$type, pam.result$cluster)
-#print(pam_table)
-
-# PAM 
-#   -> https://es.wikipedia.org/wiki/K-medoids
-#   con F1 puedes ver la def. de la funcion
-
-#pam_result <- pam(x = data_ohe, k = 2)
-
-
+#Separo los grupos para k-means = 2
 data["cluster.kmeans"] <- kmeans.result$cluster
-grupo.kmeans.1 <- summary(data[data$cluster.kmeans ==1,])
-grupo.kmeans.2 <- summary(data[data$cluster.kmeans ==2,])
+grupo.kmeans.1 <- summary(data[data$cluster.kmeans == 1,])
+grupo.kmeans.2 <- summary(data[data$cluster.kmeans == 2,])
 
 
+#PAM
+
+pam.result  = pam(x = matrix.similutd, k = 2)
+graph.pam= fviz_cluster(pam.result, data =matrix.similutd, stand = TRUE, geom = "point", ellipse = TRUE, ellypse.type = "convex")
+
+graph.pam
+pam_table  <- table(data$type, pam.result$cluster)
+print(pam_table)
+
+#--------------------------------
 # Gráficos
+#--------------------------------
 
 # type -------------------
 type_group_1 <- prop.table(100*table(data[data$cluster.kmeans ==1,]$type))
@@ -197,8 +158,64 @@ ggbarplot(type_df, x = "type", y = "n_mushrooms", xlab=c("type"), ylab="%",
           fill="group", color="group", position = position_dodge(0.8), lab.col = "group",
           palette = c("#006266", "#C4E538"),
           title = "type Proportion", label = TRUE, label.pos = "out", lab.nb.digits = 2)
-#grupo1.type <-ggplot(data=data[data$cluster.kmeans ==1,], aes(x=type,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs Type")
-#grupo1.type
+
+
+#Kmeans 3 Grupos
+data["cluster.kmeans"] <- kmeans.3.result$cluster
+kmeans_3_table  <- table(data$type, kmeans.3.result$cluster)
+print(kmeans_3_table)
+
+grupo.3.kmeans.1 <- summary(data[data$cluster.kmeans == 1,])
+grupo.3.kmeans.2 <- summary(data[data$cluster.kmeans == 2,])
+grupo.3.kmeans.3 <- summary(data[data$cluster.kmeans == 3,])
+
+type_group_1 <- prop.table(100*table(data[data$cluster.kmeans ==1,]$type))
+type_group_2 <- prop.table(100*table(data[data$cluster.kmeans ==2,]$type))
+type_group_3 <- prop.table(100*table(data[data$cluster.kmeans ==3,]$type))
+print(table(data[data$cluster.kmeans]$type))
+
+type_df <- data.frame(type=c("edible", "poisonous"),
+                      n_mushrooms=c(type_group_1, type_group_2, type_group_3),
+                      group=rep(c("1", "2", "3"), each = 2))
+
+ggbarplot(type_df, x = "type", y = "n_mushrooms", xlab=c("type"), ylab="%",
+          fill="group", color="group", position = position_dodge(0.8), lab.col = "group",
+          palette = c("#006266", "#C4E538", "#e67e22"),
+          title = "type Proportion", label = TRUE, label.pos = "out", lab.nb.digits = 2)
+
+
+#Kmeans 4 Grupos
+  data["cluster.kmeans"] <- kmeans.4.result$cluster
+  kmeans_4_table  <- table(data$type, kmeans.4.result$cluster)
+  print(kmeans_4_table)
+
+
+grupo.4.kmeans.1 <- summary(data[data$cluster.kmeans == 1,])
+grupo.4.kmeans.2 <- summary(data[data$cluster.kmeans == 2,])
+grupo.4.kmeans.3 <- summary(data[data$cluster.kmeans == 3,])
+grupo.4.kmeans.4 <- summary(data[data$cluster.kmeans == 4,])
+
+
+type_group_1 <- prop.table(100*table(data[data$cluster.kmeans ==1,]$type))
+type_group_2 <- prop.table(100*table(data[data$cluster.kmeans ==2,]$type))
+type_group_3 <- prop.table(100*table(data[data$cluster.kmeans ==3,]$type))
+type_group_4 <- prop.table(100*table(data[data$cluster.kmeans ==4,]$type))
+
+type_df <- data.frame(type=c("edible", "poisonous"),
+                      n_mushrooms=c(type_group_1, type_group_2, type_group_3, type_group_4),
+                      group=rep(c("1", "2", "3", "4"), each = 2))
+
+ggbarplot(type_df, x = "type", y = "n_mushrooms", xlab=c("type"), ylab="%",
+          fill="group", color="group", position = position_dodge(0.8), lab.col = "group",
+          palette = c("#006266", "#C4E538", "#e67e22", "#8e44ad"),
+          title = "type Proportion", label = TRUE, label.pos = "out", lab.nb.digits = 2)
+
+
+# Repetir para volver con los datos de k=2
+data["cluster.kmeans"] <- kmeans.result$cluster
+grupo.kmeans.1 <- summary(data[data$cluster.kmeans == 1,])
+grupo.kmeans.2 <- summary(data[data$cluster.kmeans == 2,])
+
 # cap_shape ---------------
 cap_shape_group_1 <- prop.table(100*table(data[data$cluster.kmeans ==1,]$cap_shape))
 cap_shape_group_2 <- prop.table(100*table(data[data$cluster.kmeans ==2,]$cap_shape))
@@ -209,11 +226,9 @@ ggbarplot(cap_shape_df, x = "cap_shape", y = "n_mushrooms", xlab=c("cap_shape"),
           fill="group", color="group", position = position_dodge(0.8), lab.col = "group",
           palette = c("#006266", "#C4E538"),
           title = "cap_shape Proportion", label = TRUE, label.pos = "out", lab.nb.digits = 2)
-#grupo1.cap_shape<- ggplot(data=data[data$cluster.kmeans ==1,], aes(x=cap_shape,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs cap_shape")
-#grupo1.cap_shape
+
+
 # cap_surface ---------------------
-#grupo1.cap_surface<- ggplot(data=data[data$cluster.kmeans ==1,], aes(x=cap_surface,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs cap_surface")
-#grupo1.cap_surface
 cap_surface_group_1 <- prop.table(100*table(data[data$cluster.kmeans ==1,]$cap_surface))
 cap_surface_group_2 <- prop.table(100*table(data[data$cluster.kmeans ==2,]$cap_surface))
 print(cap_surface_group_1)
@@ -224,9 +239,8 @@ ggbarplot(cap_surface_df, x = "cap_surface", y = "n_mushrooms", xlab=c("cap_surf
           fill="group", color="group", position = position_dodge(0.8), lab.col = "group",
           palette = c("#006266", "#C4E538"),
           title = "cap_surface Proportion", label = TRUE, label.pos = "out", lab.nb.digits = 2)
+
 # cap_color ----------------------
-#grupo1.cap_color<- ggplot(data=data[data$cluster.kmeans ==1,], aes(x=cap_color,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs cap_color")
-#grupo1.cap_color
 cap_color_group_1 <- prop.table(100*table(data[data$cluster.kmeans ==1,]$cap_color))
 cap_color_group_2 <- prop.table(100*table(data[data$cluster.kmeans ==2,]$cap_color))
 print(cap_color_group_1)
@@ -237,9 +251,8 @@ ggbarplot(cap_color_df, x = "cap_color", y = "n_mushrooms", xlab=c("cap_color"),
           fill="group", color="group", position = position_dodge(0.8), lab.col = "group",
           palette = c("#006266", "#C4E538"),
           title = "cap_color Proportion", label = TRUE, label.pos = "out", lab.nb.digits = 2)
+
 # has_bruises ----------------
-#grupo1.has_bruises<- ggplot(data=data[data$cluster.kmeans ==1,], aes(x=has_bruises,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs has_bruises")
-#grupo1.has_bruises
 has_bruises_group_1 <- prop.table(100*table(data[data$cluster.kmeans ==1,]$has_bruises))
 has_bruises_group_2 <- prop.table(100*table(data[data$cluster.kmeans ==2,]$has_bruises))
 print(has_bruises_group_1)
@@ -251,9 +264,8 @@ ggbarplot(has_bruises_df, x = "bruises", y = "n_mushrooms", xlab=c("bruises"), y
           fill="group", color="group", position = position_dodge(0.8), lab.col = "group",
           palette = c("#006266", "#C4E538"),
           title = "bruises Proportion", label = TRUE, label.pos = "out", lab.nb.digits = 2)
+
 # odo -------------------
-#grupo1.odor<- ggplot(data=data[data$cluster.kmeans ==1,], aes(x=odor,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs odor")
-#grupo1.odor
 odor_group_1 <- prop.table(100*table(data[data$cluster.kmeans ==1,]$odor))
 odor_group_2 <- prop.table(100*table(data[data$cluster.kmeans ==2,]$odor))
 print(odor_group_1)
@@ -265,9 +277,8 @@ ggbarplot(odor_df, x = "odor", y = "n_mushrooms", xlab=c("odor"), ylab="%",
           fill="group", color="group", position = position_dodge(0.8), lab.col = "group",
           palette = c("#006266", "#C4E538"),
           title = "odor Proportion", label = TRUE, label.pos = "out", lab.nb.digits = 2)
+
 # gill_attachment --------------------
-#grupo1.gill_attachment<- ggplot(data=data[data$cluster.kmeans ==1,], aes(x=gill_attachment,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs gill_attachment")
-#grupo1.gill_attachment
 gill_attachment_group_1 <- prop.table(100*table(data[data$cluster.kmeans ==1,]$gill_attachment))
 gill_attachment_group_2 <- prop.table(100*table(data[data$cluster.kmeans ==2,]$gill_attachment))
 print(gill_attachment_group_1)
@@ -279,9 +290,9 @@ ggbarplot(gill_attachment_df, x = "x", y = "n_mushrooms", xlab=c("gill_attachmen
           fill="group", color="group", position = position_dodge(0.8), lab.col = "group",
           palette = c("#006266", "#C4E538"),
           title = "gill_attachment Proportion", label = TRUE, label.pos = "out", lab.nb.digits = 2)
+
+
 # gill_spacing ----------------------
-#gripo1.gill_spacing<- ggplot(data=data[data$cluster.kmeans ==1,], aes(x=gill_spacing,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs gill_spacing")
-#gripo1.gill_spacing
 gill_spacing_group_1 <- prop.table(100*table(data[data$cluster.kmeans ==1,]$gill_spacing))
 gill_spacing_group_2 <- prop.table(100*table(data[data$cluster.kmeans ==2,]$gill_spacing))
 print(gill_spacing_group_1)
@@ -293,9 +304,9 @@ ggbarplot(gill_spacing_df, x = "x", y = "n_mushrooms", xlab=c("gill_spacing"), y
           fill="group", color="group", position = position_dodge(0.8), lab.col = "group",
           palette = c("#006266", "#C4E538"),
           title = "gill_spacing Proportion", label = TRUE, label.pos = "out", lab.nb.digits = 2)
+
+
 # gill_size --------------------------
-#grupo1.gill_size <- ggplot(data=data[data$cluster.kmeans ==1,], aes(x=gill_size,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs gill_size")
-#grupo1.gill_size
 gill_size_group_1 <- prop.table(100*table(data[data$cluster.kmeans ==1,]$gill_size))
 gill_size_group_2 <- prop.table(100*table(data[data$cluster.kmeans ==2,]$gill_size))
 print(gill_size_group_1)
@@ -307,9 +318,9 @@ ggbarplot(gill_size_df, x = "x", y = "n_mushrooms", xlab=c("gill_size"), ylab="%
           fill="group", color="group", position = position_dodge(0.8), lab.col = "group",
           palette = c("#006266", "#C4E538"),
           title = "gill_size Proportion", label = TRUE, label.pos = "out", lab.nb.digits = 2)
+
+
 # gill_color -----------------------
-#grupo1.gill_color <- ggplot(data=data[data$cluster.kmeans ==1,], aes(x=gill_color,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs gill_color")
-#grupo1.gill_color
 gill_color_group_1 <- prop.table(100*table(data[data$cluster.kmeans ==1,]$gill_color))
 gill_color_group_2 <- prop.table(100*table(data[data$cluster.kmeans ==2,]$gill_color))
 print(gill_color_group_1)
@@ -321,9 +332,9 @@ ggbarplot(gill_color_df, x = "x", y = "n_mushrooms", xlab=c("gill_color"), ylab=
           fill="group", color="group", position = position_dodge(0.8), lab.col = "group",
           palette = c("#006266", "#C4E538"),
           title = "gill_color Proportion", label = TRUE, label.pos = "out", lab.nb.digits = 2)
+
+
 # stalk_shape ---------------------
-#grupo1.stalk_shape<- ggplot(data=data[data$cluster.kmeans ==1,], aes(x=stalk_shape,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs stalk_shape")
-#grupo1.stalk_shape
 stalk_shape_group_1 <- prop.table(100*table(data[data$cluster.kmeans ==1,]$stalk_shape))
 stalk_shape_group_2 <- prop.table(100*table(data[data$cluster.kmeans ==2,]$stalk_shape))
 print(stalk_shape_group_1)
@@ -335,9 +346,9 @@ ggbarplot(stalk_shape_df, x = "x", y = "n_mushrooms", xlab=c("stalk_shape"), yla
           fill="group", color="group", position = position_dodge(0.8), lab.col = "group",
           palette = c("#006266", "#C4E538"),
           title = "stalk_shape Proportion", label = TRUE, label.pos = "out", lab.nb.digits = 2)
+
+
 #stalk_root --------------------------
-#grupo1.stalk_root<- ggplot(data=data[data$cluster.kmeans ==1,], aes(x=stalk_root,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs stalk_root")
-#grupo1.stalk_root
 stalk_root_group_1 <- prop.table(100*table(data[data$cluster.kmeans ==1,]$stalk_root))
 stalk_root_group_2 <- prop.table(100*table(data[data$cluster.kmeans ==2,]$stalk_root))
 print(stalk_root_group_1)
@@ -349,9 +360,9 @@ ggbarplot(stalk_root_df, x = "x", y = "n_mushrooms", xlab=c("stalk_root"), ylab=
           fill="group", color="group", position = position_dodge(0.8), lab.col = "group",
           palette = c("#006266", "#C4E538"),
           title = "stalk_root Proportion", label = TRUE, label.pos = "out", lab.nb.digits = 2)
+
+
 #stalk_surface_above_ring ---------------------
-#grupo1.stalk_surface_above_ring<- ggplot(data=data[data$cluster.kmeans ==1,], aes(x=stalk_surface_above_ring,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs stalk_surface_above_ring")
-#grupo1.stalk_surface_above_ring
 stalk_surface_above_ring_group_1 <- prop.table(100*table(data[data$cluster.kmeans ==1,]$stalk_surface_above_ring))
 stalk_surface_above_ring_group_2 <- prop.table(100*table(data[data$cluster.kmeans ==2,]$stalk_surface_above_ring))
 print(stalk_surface_above_ring_group_1)
@@ -363,9 +374,9 @@ ggbarplot(stalk_surface_above_ring_df, x = "x", y = "n_mushrooms", xlab=c("stalk
           fill="group", color="group", position = position_dodge(0.8), lab.col = "group",
           palette = c("#006266", "#C4E538"),
           title = "stalk_surface_above_ring Proportion", label = TRUE, label.pos = "out", lab.nb.digits = 2)
+
+
 #stalk_surface_below_ring ---------------------
-#grupo1.stalk_surface_below_ring<- ggplot(data=data[data$cluster.kmeans ==1,], aes(x=stalk_surface_below_ring,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs stalk_surface_below_ring")
-#grupo1.stalk_surface_below_ring
 stalk_surface_below_ring_group_1 <- prop.table(100*table(data[data$cluster.kmeans ==1,]$stalk_surface_below_ring))
 stalk_surface_below_ring_group_2 <- prop.table(100*table(data[data$cluster.kmeans ==2,]$stalk_surface_below_ring))
 print(stalk_surface_below_ring_group_1)
@@ -377,9 +388,9 @@ ggbarplot(stalk_surface_below_ring_df, x = "x", y = "n_mushrooms", xlab=c("stalk
           fill="group", color="group", position = position_dodge(0.8), lab.col = "group",
           palette = c("#006266", "#C4E538"),
           title = "stalk_surface_below_ring Proportion", label = TRUE, label.pos = "out", lab.nb.digits = 2)
+
+
 #stalk_color_above_ring --------------------
-#grupo1.stalk_color_above_ring<- ggplot(data=data[data$cluster.kmeans ==1,], aes(x=stalk_color_above_ring,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs stalk_color_above_ring")
-#grupo1.stalk_color_above_ring
 stalk_color_above_ring_group_1 <- prop.table(100*table(data[data$cluster.kmeans ==1,]$stalk_color_above_ring))
 stalk_color_above_ring_group_2 <- prop.table(100*table(data[data$cluster.kmeans ==2,]$stalk_color_above_ring))
 print(stalk_color_above_ring_group_1)
@@ -391,9 +402,9 @@ ggbarplot(stalk_color_above_ring_df, x = "x", y = "n_mushrooms", xlab=c("stalk_c
           fill="group", color="group", position = position_dodge(0.8), lab.col = "group",
           palette = c("#006266", "#C4E538"),
           title = "stalk_color_above_ring Proportion", label = TRUE, label.pos = "out", lab.nb.digits = 2)
+
+
 #stalk_color_below_ring ----------------------------
-#grupo1.stalk_color_below_ring<- ggplot(data=data[data$cluster.kmeans ==1,], aes(x=stalk_color_below_ring,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs stalk_color_below_ring")
-#grupo1.stalk_color_below_ring
 stalk_color_below_ring_group_1 <- prop.table(100*table(data[data$cluster.kmeans ==1,]$stalk_color_below_ring))
 stalk_color_below_ring_group_2 <- prop.table(100*table(data[data$cluster.kmeans ==2,]$stalk_color_below_ring))
 print(stalk_color_below_ring_group_1)
@@ -405,9 +416,9 @@ ggbarplot(stalk_color_below_ring_df, x = "x", y = "n_mushrooms", xlab=c("stalk_c
           fill="group", color="group", position = position_dodge(0.8), lab.col = "group",
           palette = c("#006266", "#C4E538"),
           title = "stalk_color_below_ring Proportion", label = TRUE, label.pos = "out", lab.nb.digits = 2)
+
+
 # veil_color ----------------------------
-#grupo1.veil_color<- ggplot(data=data[data$cluster.kmeans ==1,], aes(x=veil_color,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs veil_color")
-#grupo1.veil_color
 veil_color_group_1 <- prop.table(100*table(data[data$cluster.kmeans ==1,]$veil_color))
 veil_color_group_2 <- prop.table(100*table(data[data$cluster.kmeans ==2,]$veil_color))
 print(veil_color_group_1)
@@ -419,9 +430,9 @@ ggbarplot(veil_color_df, x = "x", y = "n_mushrooms", xlab=c("veil_color"), ylab=
           fill="group", color="group", position = position_dodge(0.8), lab.col = "group",
           palette = c("#006266", "#C4E538"),
           title = "veil_color Proportion", label = TRUE, label.pos = "out", lab.nb.digits = 2)
+
+
 #ring_number -----------------------
-#grupo1.ring_number<- ggplot(data=data[data$cluster.kmeans ==1,], aes(x=ring_number,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs ring_number")
-#grupo1.ring_number
 ring_number_group_1 <- prop.table(100*table(data[data$cluster.kmeans ==1,]$ring_number))
 ring_number_group_2 <- prop.table(100*table(data[data$cluster.kmeans ==2,]$ring_number))
 print(ring_number_group_1)
@@ -433,9 +444,8 @@ ggbarplot(ring_number_df, x = "x", y = "n_mushrooms", xlab=c("ring_number"), yla
           fill="group", color="group", position = position_dodge(0.8), lab.col = "group",
           palette = c("#006266", "#C4E538"),
           title = "ring_number Proportion", label = TRUE, label.pos = "out", lab.nb.digits = 2)
+
 #ring_type ---------------------------
-#grupo1.ring_type<- ggplot(data=data[data$cluster.kmeans ==1,], aes(x=ring_type,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs ring_type")
-#grupo1.ring_type
 ring_type_group_1 <- prop.table(100*table(data[data$cluster.kmeans ==1,]$ring_type))
 ring_type_group_2 <- prop.table(100*table(data[data$cluster.kmeans ==2,]$ring_type))
 print(ring_type_group_1)
@@ -447,9 +457,9 @@ ggbarplot(ring_type_df, x = "x", y = "n_mushrooms", xlab=c("ring_type"), ylab="%
           fill="group", color="group", position = position_dodge(0.8), lab.col = "group",
           palette = c("#006266", "#C4E538"),
           title = "ring_type Proportion", label = TRUE, label.pos = "out", lab.nb.digits = 2)
+
+
 #spore_print_color -------------------------
-#grupo1.spore_print_color<- ggplot(data=data[data$cluster.kmeans ==1,], aes(x=spore_print_color,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs spore_print_color")
-#grupo1.spore_print_color
 spore_print_color_group_1 <- prop.table(100*table(data[data$cluster.kmeans ==1,]$spore_print_color))
 spore_print_color_group_2 <- prop.table(100*table(data[data$cluster.kmeans ==2,]$spore_print_color))
 print(spore_print_color_group_1)
@@ -461,9 +471,9 @@ ggbarplot(spore_print_color_df, x = "x", y = "n_mushrooms", xlab=c("spore_print_
           fill="group", color="group", position = position_dodge(0.8), lab.col = "group",
           palette = c("#006266", "#C4E538"),
           title = "spore_print_color Proportion", label = TRUE, label.pos = "out", lab.nb.digits = 2)
+
+
 #population --------------------------
-#grupo1.population<- ggplot(data=data[data$cluster.kmeans ==1,], aes(x=population,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs population")
-#grupo1.population
 population_group_1 <- prop.table(100*table(data[data$cluster.kmeans ==1,]$population))
 population_group_2 <- prop.table(100*table(data[data$cluster.kmeans ==2,]$population))
 print(population_group_1)
@@ -475,9 +485,9 @@ ggbarplot(population_df, x = "x", y = "n_mushrooms", xlab=c("population"), ylab=
           fill="group", color="group", position = position_dodge(0.8), lab.col = "group",
           palette = c("#006266", "#C4E538"),
           title = "population Proportion", label = TRUE, label.pos = "out", lab.nb.digits = 2)
+
+
 #habitat ----------------------------------
-#grupo1.habitat<- ggplot(data=data[data$cluster.kmeans ==1,], aes(x=habitat,y = ..prop..,group= 1)) + geom_bar(stat="count") +ggtitle("Prop vs habitat")
-#grupo1.habitat
 habitat_group_1 <- prop.table(100*table(data[data$cluster.kmeans ==1,]$habitat))
 habitat_group_2 <- prop.table(100*table(data[data$cluster.kmeans ==2,]$habitat))
 print(habitat_group_1)
@@ -489,7 +499,4 @@ ggbarplot(habitat_df, x = "x", y = "n_mushrooms", xlab=c("habitat"), ylab="%",
           fill="group", color="group", position = position_dodge(0.8), lab.col = "group",
           palette = c("#006266", "#C4E538"),
           title = "habitat Proportion", label = TRUE, label.pos = "out", lab.nb.digits = 2)
-
-
-
 
