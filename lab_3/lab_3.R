@@ -11,8 +11,10 @@ library(caret)
 
 workdir_path <- "~/code/github.com/HectorPerezM/lab_ic_2020/lab_3"
 setwd(workdir_path)
+
 # Dataset path
 dataset_path <- "../dataset/mushroom/agaricus-lepiota.data"
+
 # Load dataset
 data <- read.csv(dataset_path, header = FALSE)
 
@@ -43,33 +45,42 @@ levels(data$population) <- c('abundant', 'clustered', 'numerous', 'scattered', '
 levels(data$habitat) <- c('woods', 'grasses', 'leaves', 'meadows', 'paths', 'urban', 'waste')
 
 
+#Pre-processing
 
+#Remove stalk_root = "missing"
 data<-data[!(data$stalk_root == "missing"),]
+
+#Eliminate veil_type
 data <- data[,-17]
 
-dummy <- dummyVars("~ .", data = data)
-data_ohe <- data.frame(predict(dummy, newdata = data))
-
-
+#Create "One-hot-encoding" data.frame
+#dummy <- dummyVars("~ .", data = data)
+#data_ohe <- data.frame(predict(dummy, newdata = data))
 #https://blog.aptitive.com/building-the-transactions-class-for-association-rule-mining-in-r-using-arules-and-apriori-c6be64268bc4
-data_ohe[data_ohe=="1"]<-"TRUE"
-data_ohe[data_ohe=="0"]<-"FALSE"
-data_trans <- as(data_ohe, "transactions")
+#data_ohe[data_ohe=="1"]<-"TRUE"
+#data_ohe[data_ohe=="0"]<-"FALSE"
 
+data_trans <- as(data, "transactions")
 
+#Create rules
+rules <- apriori(data = data_trans, appearance = list(rhs=c("type=edible"), default='lhs'), parameter = list(supp = 0.1, conf = .1))
 
+#Sortings
+rules <- sort(rules, by = "lift", decreasing = T)
+inspect(rules[1:20])
 
-#rules <- apriori(data_trans, parameter = list(support=0.6,
-#                                       confidence=0.8))
-#rules
-#inspect(head(sort(rules, by = "lift", 3)))
+#Graphs
+#Cuidado al correr, es muy pesado
 #plot(rules)
+plot(rules[1:20], method="graph", control=list(type="items"))
+plot(rules, method = "grouped")
+plot(rules, method = "grouped", control = list(k = 50))
 
-#sel -> plot(rules,
-#            measure=c("support", "lift"),
-#            shading = "confidence",
-#            interactive = TRUE)
-#
+sel <- plot(rules,
+            measure=c("support", "lift"),
+            shading = "confidence",
+            interactive = TRUE)
+
 #plot(rules.all)
 #plot(rules.all, method = "grouped")
 #plot(rules.all, method = "graph")
