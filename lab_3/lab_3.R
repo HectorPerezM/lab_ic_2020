@@ -70,6 +70,7 @@ rules <- sort(rules, by = "lift", decreasing = T)
 inspect(rules[1:20])
 
 #Graphs
+#http://finzi.psych.upenn.edu/library/arulesViz/doc/arulesViz.pdf
 #Cuidado al correr, es muy pesado
 #plot(rules)
 plot(rules[1:20], method="graph", control=list(type="items"))
