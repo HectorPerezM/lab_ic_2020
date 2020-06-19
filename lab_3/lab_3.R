@@ -63,17 +63,21 @@ data <- data[,-17]
 data_trans <- as(data, "transactions")
 
 #Create rules
-rules <- apriori(data = data_trans, appearance = list(rhs=c("type=edible"), default='lhs'), parameter = list(supp = 0.1, conf = .1))
+rules <- apriori(data = data_trans, appearance = list(rhs=c("type=edible"), default='lhs'), parameter = list(supp = 0.3, conf = .5))
+rules <- apriori(data = data_trans, appearance = list(rhs=c("type=poisonous"), default='lhs'), parameter = list(supp = 0.1, conf = 0.1))
 
 #Sortings
 rules <- sort(rules, by = "lift", decreasing = T)
-inspect(rules[1:20])
+inspect(rules[1:10])
+
+a = ruleExplorer(rules)
+print(a)
 
 #Graphs
 #http://finzi.psych.upenn.edu/library/arulesViz/doc/arulesViz.pdf
 #Cuidado al correr, es muy pesado
 #plot(rules)
-plot(rules[1:20], method="graph", control=list(type="items"))
+plot(rules[1:10], method="graph", control=list(type="items"))
 plot(rules, method = "grouped")
 plot(rules, method = "grouped", control = list(k = 50))
 
