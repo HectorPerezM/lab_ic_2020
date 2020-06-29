@@ -5,7 +5,7 @@
 #   - Pedro Silva A.
 #   - Héctor Pérez M.
 
-#Se cargan packages
+#libraries
 library(arulesViz)
 library(caret)
 
@@ -59,55 +59,24 @@ data_trans <- as(data, "transactions")
 #Reglas ---------------------------------------
 
 #Caso 1
-#Soporte bajo
-#Confianza baja
+#supp=0.1, conf=0.1, ordered by confidence, support
 
-#Caso 1.1 Ordenado por soporte
+#Caso de todas las reglas
 rules <- apriori(data = data_trans, 
                  appearance = list(rhs=c("type=poisonous"), default='lhs'), 
                  parameter = list(supp = 0.1, conf = .1))
+
+#Cantidad de reglas sin filtrar
+length(rules)
+
 #Ordenar
-ordered_rules <- sort(rules, by = "support", decreasing = T)
+ordered_rules <- sort(rules, by = c("confidence","support"), decreasing = T)
 
 #Eliminar reglas redundantes
 final_rules <- ordered_rules[!is.redundant(ordered_rules)]
 
-#Inspeccionar primeras 10 reglas
-inspect(final_rules[1:10])
-
-#Graphs
-plot(final_rules, measure = c("support", "confidence"), shading = "lift")
-plot(final_rules[1:10], method="graph")
-plot(final_rules, method = "grouped")
-
-#Caso 1.2 Ordenado por confianza
-rules <- apriori(data = data_trans, 
-                 appearance = list(rhs=c("type=poisonous"), default='lhs'), 
-                 parameter = list(supp = 0.1, conf = .1))
-#Ordenar
-ordered_rules <- sort(rules, by = "confidence", decreasing = T)
-
-#Eliminar reglas redundantes
-final_rules <- ordered_rules[!is.redundant(ordered_rules)]
-
-#Inspeccionar primeras 10 reglas
-inspect(final_rules[1:10])
-
-#Graphs
-plot(final_rules, measure = c("support", "confidence"), shading = "lift")
-plot(final_rules[1:10], method="graph")
-plot(final_rules, method = "grouped")
-
-
-#Caso 1.3 Ordenado por lift
-rules <- apriori(data = data_trans, 
-                 appearance = list(rhs=c("type=poisonous"), default='lhs'), 
-                 parameter = list(supp = 0.1, conf = .1))
-#Ordenar
-ordered_rules <- sort(rules, by = "lift", decreasing = T)
-
-#Eliminar reglas redundantes
-final_rules <- ordered_rules[!is.redundant(ordered_rules)]
+#Cantidad de reglas filtradas
+length(final_rules)
 
 #Inspeccionar primeras 10 reglas
 inspect(final_rules[1:10])
@@ -118,188 +87,113 @@ plot(final_rules[1:10], method="graph")
 plot(final_rules, method = "grouped")
 
 #Caso 2
-#Soporte bajo = 0.1
-#Confianza alta = 1
+#supp=0.1, conf=0.8, ordered by support
+#maxlen=13
+rules_case2 <- apriori(data = data_trans, 
+                       appearance = list(rhs=c("type=poisonous"), default='lhs'), 
+                       parameter = list(supp = 0.1, conf = 1))
 
-#Case 2.1
-#Ordenado por soporte
-rules <- apriori(data = data_trans, 
-                 appearance = list(rhs=c("type=poisonous"), default='lhs'), 
-                 parameter = list(supp = 0.1, conf = 1))
+#Cantidad de reglas sin filtrar
+length(rules_case2)
+
 #Ordenar
-ordered_rules <- sort(rules, by = "support", decreasing = T)
+ordered_rules_case2 <- sort(rules_case2, by = c("support"), decreasing = T)
 
 #Eliminar reglas redundantes
-final_rules <- ordered_rules[!is.redundant(ordered_rules)]
+final_rules_case2 <- ordered_rules_case2[!is.redundant(ordered_rules_case2)]
+
+#Cantidad de reglas filtradas
+length(final_rules_case2)
 
 #Inspeccionar primeras 10 reglas
-inspect(final_rules[1:10])
+inspect(final_rules_case2[1:10])
 
 #Graphs
-plot(final_rules, measure = c("support", "confidence"), shading = "lift")
-plot(final_rules[1:10], method="graph")
-plot(final_rules, method = "grouped")
+plot(final_rules_case2, measure = c("support", "confidence"), shading = "lift")
+plot(final_rules_case2[1:10], method="graph")
+plot(final_rules_case2, method = "grouped")
 
-#Case 2.2
-#Ordenado por confianza
-rules <- apriori(data = data_trans, 
-                 appearance = list(rhs=c("type=poisonous"), default='lhs'), 
-                 parameter = list(supp = 0.1, conf = 1))
-#Ordenar
-ordered_rules <- sort(rules, by = "confidence", decreasing = T)
-
-#Eliminar reglas redundantes
-final_rules <- ordered_rules[!is.redundant(ordered_rules)]
-
-#Inspeccionar primeras 10 reglas
-inspect(final_rules[1:10])
-
-#Graphs
-plot(final_rules, measure = c("support", "confidence"), shading = "lift")
-plot(final_rules[1:10], method="graph")
-plot(final_rules, method = "grouped")
-
-#Case 2.3
-#Ordenado por lift
-rules <- apriori(data = data_trans, 
-                 appearance = list(rhs=c("type=poisonous"), default='lhs'), 
-                 parameter = list(supp = 0.1, conf = 1))
-#Ordenar
-ordered_rules <- sort(rules, by = "lift", decreasing = T)
-
-#Eliminar reglas redundantes
-final_rules <- ordered_rules[!is.redundant(ordered_rules)]
-
-#Inspeccionar primeras 10 reglas
-inspect(final_rules[1:10])
-
-#Graphs
-plot(final_rules, measure = c("support", "confidence"), shading = "lift")
-plot(final_rules[1:10], method="graph")
-plot(final_rules, method = "grouped")
 
 #Caso 3
-#Soporte bajo = 0.1
-#Confianza alta = 1
-#minimo de reglas = 3
-
-#Case 3.1
-#Ordenado por soporte
-rules <- apriori(data = data_trans, 
+#supp=0.20, conf=1, ordered by support
+#maxlen=13
+rules_case3 <- apriori(data = data_trans, 
                  appearance = list(rhs=c("type=poisonous"), default='lhs'), 
-                 parameter = list(supp = 0.1, conf = 1, minlen=3))
+                 parameter = list(supp = 0.20, conf = 1))
+
+#Cantidad de reglas sin filtrar
+length(rules_case3)
+
 #Ordenar
-ordered_rules <- sort(rules, by = "support", decreasing = T)
+ordered_rules_case3 <- sort(rules_case3, by = c("support"), decreasing = T)
 
 #Eliminar reglas redundantes
-final_rules <- ordered_rules[!is.redundant(ordered_rules)]
+final_rules_case3 <- ordered_rules_case3[!is.redundant(ordered_rules_case3)]
+
+#Cantidad de reglas filtradas
+length(final_rules_case3)
 
 #Inspeccionar primeras 10 reglas
-inspect(final_rules[1:10])
+inspect(final_rules_case3[1:10])
 
 #Graphs
-plot(final_rules, measure = c("support", "confidence"), shading = "lift")
-plot(final_rules[1:10], method="graph")
-plot(final_rules, method = "grouped")
-
-#Case 3.2
-#Ordenado por confianza
-rules <- apriori(data = data_trans, 
-                 appearance = list(rhs=c("type=poisonous"), default='lhs'), 
-                 parameter = list(supp = 0.1, conf = 1, minlen=3))
-#Ordenar
-ordered_rules <- sort(rules, by = "confidence", decreasing = T)
-
-#Eliminar reglas redundantes
-final_rules <- ordered_rules[!is.redundant(ordered_rules)]
-
-#Inspeccionar primeras 10 reglas
-inspect(final_rules[1:10])
-
-#Graphs
-plot(final_rules, measure = c("support", "confidence"), shading = "lift")
-plot(final_rules[1:10], method="graph")
-plot(final_rules, method = "grouped")
-
-#Case 3.3
-#Ordenado por lift
-rules <- apriori(data = data_trans, 
-                 appearance = list(rhs=c("type=poisonous"), default='lhs'), 
-                 parameter = list(supp = 0.1, conf = 1, minlen=3))
-#Ordenar
-ordered_rules <- sort(rules, by = "lift", decreasing = T)
-
-#Eliminar reglas redundantes
-final_rules <- ordered_rules[!is.redundant(ordered_rules)]
-
-#Inspeccionar primeras 10 reglas
-inspect(final_rules[1:10])
-
-#Graphs
-plot(final_rules, measure = c("support", "confidence"), shading = "lift")
-plot(final_rules[1:10], method="graph")
-plot(final_rules, method = "grouped")
+plot(final_rules_case3, measure = c("support", "confidence"), shading = "lift")
+plot(final_rules_case3[1:10], method="graph")
+plot(final_rules_case3, method = "grouped")
 
 
 #Caso 4
-#Soporte bajo = 0.1
-#Confianza alta = 1
-#minimo de reglas = 3
-#maximo de reglas = 13
+#supp=0.25, conf=1, ordered by support
+#maxlen=13
+rules_case4 <- apriori(data = data_trans, 
+                       appearance = list(rhs=c("type=poisonous"), default='lhs'), 
+                       parameter = list(supp = 0.25, conf = 1, minlen=3, maxlen=13))
 
-#Case 4.1
-#Ordenado por soporte
-rules <- apriori(data = data_trans, 
-                 appearance = list(rhs=c("type=poisonous"), default='lhs'), 
-                 parameter = list(supp = 0.1, conf = 1, minlen=3, maxlen=13))
+#Cantidad de reglas sin filtrar
+length(rules_case4)
+
 #Ordenar
-ordered_rules <- sort(rules, by = "support", decreasing = T)
+ordered_rules_case4 <- sort(rules_case4, by = c("support"), decreasing = T)
 
 #Eliminar reglas redundantes
-final_rules <- ordered_rules[!is.redundant(ordered_rules)]
+final_rules_case4 <- ordered_rules_case4[!is.redundant(ordered_rules_case4)]
+
+#Cantidad de reglas filtrado
+length(final_rules_case4)
 
 #Inspeccionar primeras 10 reglas
-inspect(final_rules[1:10])
+inspect(final_rules_case4[1:10])
 
 #Graphs
-plot(final_rules, measure = c("support", "confidence"), shading = "lift")
-plot(final_rules[1:10], method="graph")
-plot(final_rules, method = "grouped")
+plot(final_rules_case4, measure = c("support", "confidence"), shading = "lift")
+plot(final_rules_case4[1:10], method="graph")
+plot(final_rules_case4, method = "grouped")
 
-#Case 4.2
-#Ordenado por confianza
-rules <- apriori(data = data_trans, 
-                 appearance = list(rhs=c("type=poisonous"), default='lhs'), 
-                 parameter = list(supp = 0.1, conf = 1, minlen=3, maxlen=13))
+
+#Caso 5
+#supp=0.25, conf=1, ordered by support
+#maxlen=13
+rules_case5 <- apriori(data = data_trans, 
+                         appearance = list(rhs=c("type=poisonous"), default='lhs'), 
+                         parameter = list(supp = 0.25, conf = 1, minlen=6, maxlen=13))
+
+#Cantidad de reglas sin filtrar
+length(rules_case5)
+
 #Ordenar
-ordered_rules <- sort(rules, by = "confidence", decreasing = T)
+ordered_rules_case5 <- sort(rules_case5, by = c("support"), decreasing = T)
 
 #Eliminar reglas redundantes
-final_rules <- ordered_rules[!is.redundant(ordered_rules)]
+final_rules_case5 <- ordered_rules_case5[!is.redundant(ordered_rules_case5)]
+
+#Cantidad de reglas filtradas
+length(final_rules_case5)
+
 
 #Inspeccionar primeras 10 reglas
-inspect(final_rules[1:10])
+inspect(final_rules_case5[1:10])
 
 #Graphs
-plot(final_rules, measure = c("support", "confidence"), shading = "lift")
-plot(final_rules[1:10], method="graph")
-plot(final_rules, method = "grouped")
-
-#Case 4.3
-#Ordenado por lift
-rules <- apriori(data = data_trans, 
-                 appearance = list(rhs=c("type=poisonous"), default='lhs'), 
-                 parameter = list(supp = 0.1, conf = 1, minlen=3,maxlen=13))
-#Ordenar
-ordered_rules <- sort(rules, by = c("lift", "support"), decreasing = T)
-
-#Eliminar reglas redundantes
-final_rules <- ordered_rules[!is.redundant(ordered_rules)]
-
-#Inspeccionar primeras 10 reglas
-inspect(final_rules[1:10])
-
-#Graphs
-plot(final_rules, measure = c("support", "confidence"), shading = "lift")
-plot(final_rules[1:10], method="graph")
-plot(final_rules, method = "grouped")
+plot(final_rules_case5, measure = c("support", "confidence"), shading = "lift")
+plot(final_rules_case5[1:10], method="graph")
+plot(final_rules_case5, method = "grouped")
