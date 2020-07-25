@@ -27,14 +27,17 @@ names(data) <- c("type", "cap_shape", "cap_surface", "cap_color", "has_bruises",
 
 # ---------- Preprocessing ---------------------
 
+#Remove stalk_root = "missing"
+data<-data[!(data$stalk_root == "?"),]
+
 #Eliminate veil_type
 data$veil_type <- NULL
 
 set.seed(123)
 
 #From: https://stackoverflow.com/questions/17200114/how-to-split-data-into-training-testing-sets-using-sample-function
-#Separated dataset into train (60%) and test (40%)
-sample <- sample.split(data[,1], SplitRatio = 0.60)
+#Separated dataset into train (80%) and test (20%)
+sample <- sample.split(data[,1], SplitRatio = 0.80)
 train_sample <- subset(data, sample == TRUE)
 test_sample <- subset(data, sample == FALSE)
 
@@ -43,7 +46,7 @@ test_sample <- subset(data, sample == FALSE)
 # ---------- Decision Tree using C50 package ---------------------
 # From: https://github.com/neburs/mushrooms-classification
 
-c50_model <- C5.0(train_sample[,-1], train_sample$type)
+c50_model <- C5.0(train_sample[,-1], train_sample$type, rules = FALSE)
 summary(c50_model)
 
 
@@ -52,6 +55,9 @@ CrossTable(test_sample$type, c50_model_prediction, prop.chisq = FALSE, prop.c = 
 
 #Accuracy
 sum(c50_model_prediction == test_sample$type) / length(c50_model_prediction)
+
+#Plot
+plot(c50_model)
 # ---------- End Decision Tree using C50 package -----------------
 
 # ---------- Decision Tree using OneR package --------------------
@@ -63,5 +69,4 @@ oneR_model
 
 oneR_model_prediction <- predict(oneR_model, data)
 table(actual = data$type, predicted = oneR_model_prediction)
-
-  # ---------- End Decision Tree using OneR package ----------------
+# ---------- End Decision Tree using OneR package ----------------
