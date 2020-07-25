@@ -10,7 +10,8 @@
 library(C50) # create decision tree model 
 library(caTools) # for split dataset
 library(gmodels)  # for cross table
- 
+library(OneR) #for create decision tree model but with OneR
+
 #Cambiar de ser necesario
 workdir_path <- "~/code/github.com/HectorPerezM/lab_ic_2020/lab_4"
 setwd(workdir_path)
@@ -54,7 +55,13 @@ sum(c50_model_prediction == test_sample$type) / length(c50_model_prediction)
 # ---------- End Decision Tree using C50 package -----------------
 
 # ---------- Decision Tree using OneR package --------------------
+# From:  Machine Learning with R: Expert techniques for predictive modeling, 3rd Edition. Author: Brett Lantz
+#        page: 158 - 162
 
+oneR_model <- OneR(type ~ ., data = data)
+oneR_model
 
+oneR_model_prediction <- predict(oneR_model, data)
+table(actual = data$type, predicted = oneR_model_prediction)
 
-# ---------- End Decision Tree using OneR package ----------------
+  # ---------- End Decision Tree using OneR package ----------------
