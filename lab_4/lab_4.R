@@ -10,7 +10,6 @@
 library(C50) # create decision tree model 
 library(caTools) # for split dataset
 library(gmodels)  # for cross table
-library(OneR) #for create decision tree model but with OneR
 
 #Cambiar de ser necesario
 workdir_path <- "~/code/github.com/HectorPerezM/lab_ic_2020/lab_4"
@@ -43,13 +42,20 @@ test_sample <- subset(data, sample == FALSE)
 
 # ---------- End -------------------------------
 
-# ---------- Decision Tree using C50 package ---------------------
+# ---------- Decision Tree using C50 package Case 1 ---------------------
 # From: https://github.com/neburs/mushrooms-classification
+c50_model <- C5.0(train_sample[,-1], train_sample$type, 
+                  control = C5.0Control(winnow = FALSE, noGlobalPruning = TRUE, earlyStopping = TRUE, CF = 0.25),
+                  rules = FALSE)
 
-c50_model <- C5.0(train_sample[,-1], train_sample$type, rules = FALSE)
+# Summary
 summary(c50_model)
 
+# Var importance
+C5imp(c50_model, metric = "usage", pct = TRUE)
 
+
+# Pred
 c50_model_prediction <- predict(c50_model, test_sample, type="class")
 CrossTable(test_sample$type, c50_model_prediction, prop.chisq = FALSE, prop.c = FALSE, prop.r = FALSE, dnn = c('Actual Default', 'Predicted Default'))
 
@@ -58,15 +64,28 @@ sum(c50_model_prediction == test_sample$type) / length(c50_model_prediction)
 
 #Plot
 plot(c50_model)
-# ---------- End Decision Tree using C50 package -----------------
+# ---------- End Decision Tree using C50 package -------------------------
 
-# ---------- Decision Tree using OneR package --------------------
-# From:  Machine Learning with R: Expert techniques for predictive modeling, 3rd Edition. Author: Brett Lantz
-#        page: 158 - 162
+# ---------- Decision Tree using C50 package Case 2 ---------------------
+# Se varia CF a 0.7, winnow a TRUE, noGlobalPrunning FALSE, earlyStopping a FALSE
+c50_model_modified <- C5.0(train_sample[,-1], train_sample$type, 
+                  control = C5.0Control(winnow = TRUE, noGlobalPruning = FALSE, earlyStopping = FALSE, CF = 0.7),
+                  rules = FALSE)
 
-oneR_model <- OneR(type ~ ., data = data)
-oneR_model
+# Summary
+summary(c50_model_modified)
 
-oneR_model_prediction <- predict(oneR_model, data)
-table(actual = data$type, predicted = oneR_model_prediction)
-# ---------- End Decision Tree using OneR package ----------------
+# Var importance
+C5imp(c50_model_modified, metric = "usage", pct = TRUE)
+
+
+# Pred
+c50_model_modified_prediction <- predict(c50_model_modified, test_sample, type="class")
+CrossTable(test_sample$type, c50_model_modified_prediction, prop.chisq = FALSE, prop.c = FALSE, prop.r = FALSE, dnn = c('Actual Default', 'Predicted Default'))
+
+#Accuracy
+sum(c50_model_modified_prediction == test_sample$type) / length(c50_model_modified_prediction)
+
+#Plot
+plot(c50_model_modified)
+# ---------- End Decision Tree using C50 package -------------------------
